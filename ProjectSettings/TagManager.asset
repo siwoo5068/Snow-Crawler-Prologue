@@ -10,6 +10,7 @@ TagManager:
   - TimeItem
   - CraftingTable
   - ExitPoint
+  - FurnitureItem
   layers:
   - Default
   - TransparentFX

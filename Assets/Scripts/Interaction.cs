@@ -4,6 +4,13 @@ public class Interaction : MonoBehaviour
 {
     public float interactRange = 3f;
     public SurvivalTimer timer;
+    public PlayerInventory inventory;
+
+    void Start()
+    {
+        if (timer == null) timer = GetComponent<SurvivalTimer>();
+        if (inventory == null) inventory = GetComponent<PlayerInventory>();
+    }
 
     void Update()
     {
@@ -23,11 +30,11 @@ public class Interaction : MonoBehaviour
 
         foreach (var hitCollider in hitColliders)
         {
-            // 이제 ExitPoint(무전기) 태그도 레이더망에 걸리게 합니다.
             if (hitCollider.CompareTag("TimeItem") ||
                 hitCollider.CompareTag("MaterialItem") ||
                 hitCollider.CompareTag("CraftingTable") ||
-                hitCollider.CompareTag("ExitPoint"))
+                hitCollider.CompareTag("ExitPoint") ||
+                hitCollider.CompareTag("FurnitureItem"))
             {
                 float distance = Vector3.Distance(radarCenter, hitCollider.transform.position);
                 if (distance < minDistance)
@@ -38,35 +45,35 @@ public class Interaction : MonoBehaviour
             }
         }
 
-        if (closestCollider != null)
+        if (closestCollider == null) return;
+
+        if (closestCollider.CompareTag("TimeItem"))
         {
-            if (closestCollider.CompareTag("TimeItem"))
+            if (timer != null) timer.AddTime(5f);
+            Destroy(closestCollider.gameObject);
+        }
+        else if (closestCollider.CompareTag("MaterialItem"))
+        {
+            if (timer != null) timer.AddMaterial(1);
+            Destroy(closestCollider.gameObject);
+        }
+        else if (closestCollider.CompareTag("CraftingTable"))
+        {
+            if (timer != null) timer.UpgradeCoat();
+        }
+        else if (closestCollider.CompareTag("ExitPoint"))
+        {
+            if (timer != null && timer.isUpgraded)
+                timer.WinGame();
+        }
+        else if (closestCollider.CompareTag("FurnitureItem"))
+        {
+            FurnitureItem furniture = closestCollider.GetComponent<FurnitureItem>();
+            if (furniture != null && inventory != null)
             {
-                if (timer != null) timer.AddTime(5f);
+                inventory.AddItem(furniture.itemType);
                 Destroy(closestCollider.gameObject);
-            }
-            else if (closestCollider.CompareTag("MaterialItem"))
-            {
-                if (timer != null) timer.AddMaterial(1);
-                Destroy(closestCollider.gameObject);
-            }
-            else if (closestCollider.CompareTag("CraftingTable"))
-            {
-                if (timer != null) timer.UpgradeCoat();
-            }
-            // 🌟 추가: 가장 가까운 게 무전기(ExitPoint)라면?
-            else if (closestCollider.CompareTag("ExitPoint"))
-            {
-                // 코트 업그레이드를 한 상태여야만 탈출 가능! (기획 의도)
-                if (timer.isUpgraded)
-                {
-                    timer.WinGame();
-                }
-                else
-                {
-                    Debug.Log("너무 추워서 무전기를 칠 수 없습니다! 코트부터 만드세요.");
-                }
             }
         }
     }
-}
+}
