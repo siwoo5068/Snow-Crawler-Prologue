@@ -12,6 +12,7 @@ public class SurvivalTimer : MonoBehaviour
     [Header("생존 설정")]
     public float maxTime = 10f;
     private float currentTime;
+    public float TimeRatio { get { return maxTime > 0f ? currentTime / maxTime : 0f; } }
     private bool isDead = false;
     private bool isWin = false;
     public bool inSafeZone = true;   // 🌟 겹쳐놓으셨으니 시작을 true로!
