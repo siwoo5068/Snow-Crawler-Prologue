@@ -3,16 +3,27 @@ using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
 {
+    [Header("Weight Settings")]
+    public float maxWeight = 15f;
+
     public float TotalWeight { get; private set; }
 
     private List<ItemType> items = new List<ItemType>();
 
-    public void AddItem(ItemType type)
+    public bool CanCarry(ItemType type)
     {
-        items.Add(type);
+        if (!ItemDatabase.Weight.TryGetValue(type, out float w)) return true;
+        return TotalWeight + w <= maxWeight;
+    }
 
+    public bool AddItem(ItemType type)
+    {
+        if (!CanCarry(type)) return false;
+
+        items.Add(type);
         if (ItemDatabase.Weight.TryGetValue(type, out float w))
             TotalWeight += w;
+        return true;
     }
 
     public void RemoveItem(ItemType type)
@@ -21,6 +32,14 @@ public class PlayerInventory : MonoBehaviour
 
         if (ItemDatabase.Weight.TryGetValue(type, out float w))
             TotalWeight = Mathf.Max(0f, TotalWeight - w);
+    }
+
+    public ItemType? DropLastItem()
+    {
+        if (items.Count == 0) return null;
+        var last = items[items.Count - 1];
+        RemoveItem(last);
+        return last;
     }
 
     public int GetItemCount() => items.Count;
