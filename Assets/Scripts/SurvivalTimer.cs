@@ -3,10 +3,9 @@ using TMPro;
 
 public class SurvivalTimer : MonoBehaviour
 {
-    [Header("UI 연결 (Canvas에서 드래그)")]
+    [Header("UI 연결")]
     public TextMeshProUGUI timerText;
     public GameObject gameOverPanel;
-    public GameObject winPanel;      // 🌟 승리 화면 패널
     public TextMeshProUGUI inventoryText;
 
     [Header("생존 설정")]
@@ -14,12 +13,17 @@ public class SurvivalTimer : MonoBehaviour
     private float currentTime;
     public float TimeRatio { get { return maxTime > 0f ? currentTime / maxTime : 0f; } }
     private bool isDead = false;
-    private bool isWin = false;
-    public bool inSafeZone = true;   // 🌟 겹쳐놓으셨으니 시작을 true로!
+    public bool inSafeZone = true;
+
+    [Header("안전지대 회복")]
+    public float recoverySpeed = 5f;   // 초당 회복 속도 (5초 = 5초/s)
 
     [Header("재료 및 업그레이드")]
     public int materialCount = 0;
-    public bool isUpgraded = false;
+    public int upgradeLevel = 0;
+    public int maxUpgradeLevel = 3;
+    public int materialsPerUpgrade = 3;
+    public float timePerUpgrade = 10f;
 
     void Start()
     {
@@ -27,15 +31,13 @@ public class SurvivalTimer : MonoBehaviour
 
         // 모든 패널 초기화
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
-        if (winPanel != null) winPanel.SetActive(false);
-
         UpdateInventoryUI();
     }
 
     void Update()
     {
-        // 죽었거나 이미 이겼으면 아무것도 안 함
-        if (isDead || isWin) return;
+        // 죽었으면 아무것도 안 함
+        if (isDead) return;
 
         if (!inSafeZone)
         {
@@ -55,15 +57,24 @@ public class SurvivalTimer : MonoBehaviour
         }
         else
         {
-            // 안전지대 안: 시간 풀충전
-            currentTime = maxTime;
+            // 안전지대 안: 점진적 회복
+            currentTime = Mathf.MoveTowards(currentTime, maxTime, recoverySpeed * Time.deltaTime);
             if (timerText != null)
             {
-                timerText.text = "Safe Zone";
-                timerText.color = Color.green;
+                if (currentTime >= maxTime)
+                {
+                    timerText.text = "Safe";
+                    timerText.color = Color.green;
+                }
+                else
+                {
+                    timerText.text = string.Format("Warming... {0:F0}s", currentTime);
+                    timerText.color = Color.yellow;
+                }
             }
         }
     }
+
 
     // 아이템 먹었을 때 시간 추가
     public void AddTime(float bonusTime)
@@ -72,50 +83,46 @@ public class SurvivalTimer : MonoBehaviour
         if (currentTime > maxTime) currentTime = maxTime;
     }
 
-    // 재료 추가
+    // 재료(SupplyBox) 수집
     public void AddMaterial(int amount)
     {
         materialCount += amount;
         UpdateInventoryUI();
     }
 
-    // 가방 UI 업데이트
+    // 작업대에서 호출: 재료를 소모하여 생존 시간 업그레이드
+    public void UpgradeCoat()
+    {
+        if (upgradeLevel >= maxUpgradeLevel)
+        {
+            Debug.Log("최대 업그레이드 달성!");
+            return;
+        }
+
+        if (materialCount >= materialsPerUpgrade)
+        {
+            materialCount -= materialsPerUpgrade;
+            upgradeLevel++;
+            maxTime += timePerUpgrade;
+            currentTime = maxTime;
+            UpdateInventoryUI();
+            Debug.Log(string.Format("업그레이드 Lv.{0}! 생존시간 {1}초", upgradeLevel, maxTime));
+        }
+        else
+        {
+            Debug.Log(string.Format("재료 부족! ({0}/{1})", materialCount, materialsPerUpgrade));
+        }
+    }
+
     void UpdateInventoryUI()
     {
         if (inventoryText != null)
         {
-            inventoryText.text = "Material : " + materialCount + " / 5";
+            string upgradeInfo = upgradeLevel < maxUpgradeLevel
+                ? string.Format("Material: {0} / {1}", materialCount, materialsPerUpgrade)
+                : string.Format("Material: {0} [MAX]", materialCount);
+            inventoryText.text = upgradeInfo;
         }
-    }
-
-    // 🌟 작업대에서 호출할 코트 제작 기능
-    public void UpgradeCoat()
-    {
-        if (isUpgraded) return;
-
-        if (materialCount >= 5)
-        {
-            materialCount -= 5;
-            maxTime = 30f;
-            currentTime = maxTime;
-            isUpgraded = true;
-            UpdateInventoryUI();
-            Debug.Log("코트 제작 완료! 30초 생존 가능!");
-        }
-        else
-        {
-            Debug.Log("재료 부족! (현재: " + materialCount + "/5)");
-        }
-    }
-
-    // 🌟 무전기에서 호출할 승리 기능
-    public void WinGame()
-    {
-        if (isDead) return;
-        isWin = true;
-        if (winPanel != null) winPanel.SetActive(true);
-        Time.timeScale = 0f; // 게임 멈춤
-        Debug.Log("탈출 성공!");
     }
 
     void GameOver()
@@ -123,6 +130,17 @@ public class SurvivalTimer : MonoBehaviour
         isDead = true;
         if (gameOverPanel != null) gameOverPanel.SetActive(true);
         Time.timeScale = 0f;
+    }
+
+    // R키 재시작 (GameOver 상태에서)
+    void LateUpdate()
+    {
+        if (isDead && Input.GetKeyDown(KeyCode.R))
+        {
+            Time.timeScale = 1f;
+            UnityEngine.SceneManagement.SceneManager.LoadScene(
+                UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
+        }
     }
 
     // 트리거 감지 (이게 있어야 나갔다 들어올 때 작동해요!)
