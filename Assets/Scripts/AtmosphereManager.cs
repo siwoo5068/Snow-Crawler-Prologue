@@ -7,6 +7,7 @@ public class AtmosphereManager : MonoBehaviour
     public SurvivalTimer survivalTimer;
     public Image frostOverlay;
     public Light environmentLight;
+    public CabinComfort cabinComfort;
 
     [Header("Frost Settings")]
     public float maxFrostAlpha = 0.7f;
@@ -97,8 +98,10 @@ public class AtmosphereManager : MonoBehaviour
 
         if (survivalTimer.inSafeZone)
         {
+            float comfort = (cabinComfort != null) ? cabinComfort.ComfortRatio : 0f;
+            float comfortBoost = Mathf.Lerp(0.5f, 1f, comfort);
             targetColor = warmLightColor;
-            targetIntensity = warmIntensity;
+            targetIntensity = warmIntensity * comfortBoost;
         }
         else
         {
