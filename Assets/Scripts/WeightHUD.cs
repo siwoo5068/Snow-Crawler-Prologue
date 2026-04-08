@@ -30,8 +30,11 @@ public class WeightHUD : MonoBehaviour
         int count = inventory.GetItemCount();
 
         weightText.text = count > 0
-            ? string.Format("Weight: {0:F1} kg ({1})", weight, count)
+            ? string.Format("Weight: {0:F1} / {1:F0} kg ({2})", weight, inventory.maxWeight, count)
             : "Weight: Empty";
+
+        if (weight >= inventory.maxWeight)
+            weightText.text += "  [MAX]";
 
         float ratio = Mathf.Clamp01(weight / dangerWeight);
 
