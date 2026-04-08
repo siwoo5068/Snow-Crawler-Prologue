@@ -5,11 +5,13 @@ public class Interaction : MonoBehaviour
     public float interactRange = 3f;
     public SurvivalTimer timer;
     public PlayerInventory inventory;
+    public GameProgress gameProgress;
 
     void Start()
     {
         if (timer == null) timer = GetComponent<SurvivalTimer>();
         if (inventory == null) inventory = GetComponent<PlayerInventory>();
+        if (gameProgress == null) gameProgress = GameObject.FindObjectOfType<GameProgress>();
     }
 
     void Update()
@@ -30,11 +32,11 @@ public class Interaction : MonoBehaviour
 
         foreach (var hitCollider in hitColliders)
         {
-            if (hitCollider.CompareTag("TimeItem") ||
+            if (hitCollider.CompareTag("FurnitureItem") ||
+                hitCollider.CompareTag("TimeItem") ||
                 hitCollider.CompareTag("MaterialItem") ||
                 hitCollider.CompareTag("CraftingTable") ||
-                hitCollider.CompareTag("ExitPoint") ||
-                hitCollider.CompareTag("FurnitureItem"))
+                hitCollider.CompareTag("ExitPoint"))
             {
                 float distance = Vector3.Distance(radarCenter, hitCollider.transform.position);
                 if (distance < minDistance)
@@ -63,16 +65,15 @@ public class Interaction : MonoBehaviour
         }
         else if (closestCollider.CompareTag("ExitPoint"))
         {
-            if (timer != null && timer.isUpgraded)
-                timer.WinGame();
+            if (gameProgress != null) gameProgress.TryWin();
         }
         else if (closestCollider.CompareTag("FurnitureItem"))
         {
             FurnitureItem furniture = closestCollider.GetComponent<FurnitureItem>();
             if (furniture != null && inventory != null)
             {
-                inventory.AddItem(furniture.itemType);
-                Destroy(closestCollider.gameObject);
+                if (inventory.AddItem(furniture.itemType))
+                    Destroy(closestCollider.gameObject);
             }
         }
     }
