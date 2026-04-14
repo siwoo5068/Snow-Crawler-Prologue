@@ -44,19 +44,19 @@ public class GameProgress : MonoBehaviour
 
         if (coatOk && comfortOk)
         {
-            radioHintText.text = "<color=#FFD700>★ 무전기로 구조 요청 가능!</color>";
+            radioHintText.text = "<color=#FFD700>★ Radio rescue available!</color>";
         }
         else
         {
             string coat = coatOk
-                ? "<color=#90EE90>✔ 코트 업그레이드</color>"
-                : string.Format("<color=#FF6B6B>✘ 코트 Lv.{0} 필요</color>", requiredUpgradeLevel);
+                ? "<color=#90EE90>✔ Coat upgraded</color>"
+                : string.Format("<color=#FF6B6B>✘ Coat Lv.{0} required</color>", requiredUpgradeLevel);
 
             int placed = cabinComfort.PlacedCount;
             int needed = Mathf.CeilToInt(cabinComfort.maxFurnitureCount * requiredComfortRatio);
             string comfort = comfortOk
-                ? "<color=#90EE90>✔ 오두막 정리</color>"
-                : string.Format("<color=#FF6B6B>✘ 가구 {0}/{1} 배치</color>", placed, needed);
+                ? "<color=#90EE90>✔ Cabin ready</color>"
+                : string.Format("<color=#FF6B6B>✘ Furniture {0}/{1} placed</color>", placed, needed);
 
             radioHintText.text = coat + "  " + comfort;
         }
@@ -77,8 +77,7 @@ public class GameProgress : MonoBehaviour
         }
         else
         {
-            // 조건 미달 피드백 (RadioHint가 알아서 표시)
-            Debug.Log("조건 미달: 코트=" + coatOk + " 가구=" + comfortOk);
+            Debug.Log("Win conditions not met: coat=" + coatOk + " comfort=" + comfortOk);
             return false;
         }
     }
@@ -95,12 +94,12 @@ public class GameProgress : MonoBehaviour
         int secs = Mathf.FloorToInt(elapsed % 60f);
 
         if (winTitleText != null)
-            winTitleText.text = "밤을 버텼다...";
+            winTitleText.text = "You survived the night...";
 
         if (winStatsText != null)
         {
             winStatsText.text = string.Format(
-                "생존 시간: {0:00}:{1:00}\n코트 업그레이드: Lv.{2}\n배치한 가구: {3}개\n",
+                "Survival Time: {0:00}:{1:00}\nCoat Level: Lv.{2}\nFurniture Placed: {3}\n",
                 mins, secs,
                 survivalTimer != null ? survivalTimer.upgradeLevel : 0,
                 cabinComfort != null ? cabinComfort.PlacedCount : 0

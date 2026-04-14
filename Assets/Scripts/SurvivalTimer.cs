@@ -3,22 +3,22 @@ using TMPro;
 
 public class SurvivalTimer : MonoBehaviour
 {
-    [Header("UI 연결")]
+    [Header("UI References")]
     public TextMeshProUGUI timerText;
     public GameObject gameOverPanel;
     public TextMeshProUGUI inventoryText;
 
-    [Header("생존 설정")]
+    [Header("Survival Settings")]
     public float maxTime = 10f;
     private float currentTime;
     public float TimeRatio { get { return maxTime > 0f ? currentTime / maxTime : 0f; } }
     private bool isDead = false;
     public bool inSafeZone = true;
 
-    [Header("안전지대 회복")]
+    [Header("Safe Zone Recovery")]
     public float recoverySpeed = 5f;   // 초당 회복 속도 (5초 = 5초/s)
 
-    [Header("재료 및 업그레이드")]
+    [Header("Materials & Upgrade")]
     public int materialCount = 0;
     public int upgradeLevel = 0;
     public int maxUpgradeLevel = 3;
@@ -95,7 +95,7 @@ public class SurvivalTimer : MonoBehaviour
     {
         if (upgradeLevel >= maxUpgradeLevel)
         {
-            Debug.Log("최대 업그레이드 달성!");
+            Debug.Log("Max upgrade reached!");
             return;
         }
 
@@ -106,11 +106,11 @@ public class SurvivalTimer : MonoBehaviour
             maxTime += timePerUpgrade;
             currentTime = maxTime;
             UpdateInventoryUI();
-            Debug.Log(string.Format("업그레이드 Lv.{0}! 생존시간 {1}초", upgradeLevel, maxTime));
+            Debug.Log(string.Format("Upgraded Lv.{0}! Survival time: {1}s", upgradeLevel, maxTime));
         }
         else
         {
-            Debug.Log(string.Format("재료 부족! ({0}/{1})", materialCount, materialsPerUpgrade));
+            Debug.Log(string.Format("Not enough materials! ({0}/{1})", materialCount, materialsPerUpgrade));
         }
     }
 
