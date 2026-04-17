@@ -11,7 +11,11 @@ public class Interaction : MonoBehaviour
     {
         if (timer == null) timer = GetComponent<SurvivalTimer>();
         if (inventory == null) inventory = GetComponent<PlayerInventory>();
-        if (gameProgress == null) gameProgress = GameObject.FindObjectOfType<GameProgress>();
+#if UNITY_2023_1_OR_NEWER
+        if (gameProgress == null) gameProgress = Object.FindAnyObjectByType<GameProgress>();
+#else
+        if (gameProgress == null) gameProgress = Object.FindObjectOfType<GameProgress>();
+#endif
     }
 
     void Update()
@@ -77,4 +81,4 @@ public class Interaction : MonoBehaviour
             }
         }
     }
-}
+}

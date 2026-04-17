@@ -41,7 +41,11 @@ public class FurnitureDrop : MonoBehaviour
         droppedObj.name = "Dropped_" + dropped.Value;
         droppedObj.transform.position = spawnPos;
         droppedObj.transform.localScale = Vector3.one * 0.6f;
-        droppedObj.tag = "FurnitureItem";
+
+        var col = droppedObj.GetComponent<Collider>();
+        if (col != null) Object.Destroy(col);
+
+        droppedObj.tag = "Untagged";
 
         FurnitureItem fi = droppedObj.AddComponent<FurnitureItem>();
         fi.itemType = dropped.Value;

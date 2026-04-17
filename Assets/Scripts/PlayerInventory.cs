@@ -45,4 +45,10 @@ public class PlayerInventory : MonoBehaviour
     public int GetItemCount() => items.Count;
 
     public IReadOnlyList<ItemType> GetItems() => items;
+
+    public void ResetState()
+    {
+        items.Clear();
+        TotalWeight = 0f;
+    }
 }

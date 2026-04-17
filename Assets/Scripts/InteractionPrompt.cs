@@ -6,6 +6,7 @@ public class InteractionPrompt : MonoBehaviour
     [Header("References")]
     public SurvivalTimer survivalTimer;
     public PlayerInventory inventory;
+    public GameProgress gameProgress;
 
     [Header("UI")]
     public TextMeshProUGUI promptText;
@@ -15,47 +16,69 @@ public class InteractionPrompt : MonoBehaviour
     public LayerMask interactLayer;
 
     private Camera _cam;
+    private string _lastMessage = "";
 
     void Start()
     {
-        // Camera.main은 태그가 "MainCamera"인 활성화된 카메라를 반환.
-        // 메인 메뉴 상태에서는 playerCamera가 꺼져 있어 null일 수 있으므로
-        // 직접 Player 자식에서 찾아서 보관.
-        var player = GameObject.FindWithTag("Player");
-        if (player != null)
-            _cam = player.GetComponentInChildren<Camera>(true); // inactive 포함 탐색
+        ResolveCamera();
 
         if (survivalTimer == null)
             survivalTimer = GetComponent<SurvivalTimer>();
         if (inventory == null)
             inventory = GetComponent<PlayerInventory>();
+        if (gameProgress == null)
+        {
+#if UNITY_2023_1_OR_NEWER
+            gameProgress = Object.FindAnyObjectByType<GameProgress>();
+#else
+            gameProgress = Object.FindObjectOfType<GameProgress>();
+#endif
+        }
 
         if (promptText != null)
             promptText.text = "";
+    }
+
+    void OnEnable()
+    {
+        ResolveCamera();
+    }
+
+    void ResolveCamera()
+    {
+        var player = GameObject.FindWithTag("Player");
+        if (player != null)
+        {
+            var cam = player.GetComponentInChildren<Camera>(true);
+            if (cam != null)
+            {
+                _cam = cam;
+                return;
+            }
+        }
+        _cam = Camera.main;
     }
 
     void Update()
     {
         if (promptText == null) return;
 
-        // ── 핵심 null 가드 ──────────────────────────────────────
-        // 1) 카메라가 없거나 비활성화 상태면 (메인 메뉴 상태) 즉시 종료.
-        //    _cam이 꺼져 있어도 ViewportPointToRay가 NullRef를 터뜨리므로
-        //    enabled 체크를 반드시 해야 함.
         if (_cam == null || !_cam.enabled || !_cam.gameObject.activeInHierarchy)
         {
             promptText.text = "";
             return;
         }
-        // ─────────────────────────────────────────────────────────
 
         string message = GetPromptMessage();
-        promptText.text = message;
+        if (message != _lastMessage)
+        {
+            _lastMessage = message;
+            promptText.text = message;
+        }
     }
 
     string GetPromptMessage()
     {
-        // _cam이 여기까지 왔으면 반드시 활성 상태
         Ray ray = _cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
         RaycastHit hit;
 
@@ -98,7 +121,7 @@ public class InteractionPrompt : MonoBehaviour
                     if (lv >= maxLv)
                         return "<color=#FFD700>[Workbench] Coat fully upgraded!</color>";
                     else if (mat >= need)
-                        return string.Format("<color=#90EE90>[E] Upgrade Coat  ({0}/{1} mats)  +10s</color>", mat, need);
+                        return string.Format("<color=#90EE90>[E] Upgrade Coat  ({0}/{1} mats)  +{2:F0}s</color>", mat, need, survivalTimer.timePerUpgrade);
                     else
                         return string.Format("[Workbench] Not enough materials  ({0}/{1})", mat, need);
                 }
@@ -106,11 +129,33 @@ public class InteractionPrompt : MonoBehaviour
             }
             else if (tag == "ExitPoint")
             {
-                return "[E] Radio  (Request Rescue)";
+                if (gameProgress != null && survivalTimer != null)
+                {
+                    bool coatOk    = survivalTimer.upgradeLevel >= gameProgress.requiredUpgradeLevel;
+                    bool comfortOk = gameProgress.cabinComfort != null
+                        && gameProgress.cabinComfort.ComfortRatio >= gameProgress.requiredComfortRatio;
+
+                    if (coatOk && comfortOk)
+                        return "<color=#FFD700>[E] Radio  — Call for Rescue</color>";
+
+                    string coat = coatOk
+                        ? "Coat: OK"
+                        : string.Format("Coat: Lv.{0} needed", gameProgress.requiredUpgradeLevel);
+
+                    int placed = gameProgress.cabinComfort != null ? gameProgress.cabinComfort.PlacedCount : 0;
+                    int needed = gameProgress.cabinComfort != null
+                        ? Mathf.CeilToInt(gameProgress.cabinComfort.maxFurnitureCount * gameProgress.requiredComfortRatio)
+                        : 0;
+                    string comfort = comfortOk
+                        ? "Cabin: Ready"
+                        : string.Format("Cabin: {0}/{1} furniture", placed, needed);
+
+                    return string.Format("[Radio] Not ready  ({0}  /  {1})", coat, comfort);
+                }
+                return "[E] Radio";
             }
         }
 
-        // Raycast 미스 + 안전지대 안 + 인벤토리에 가구 있음
         if (survivalTimer != null && survivalTimer.inSafeZone
             && inventory != null && inventory.GetItemCount() > 0)
         {
