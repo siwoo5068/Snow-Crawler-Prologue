@@ -18,12 +18,21 @@ public class FootstepSound : MonoBehaviour
 
     void Start()
     {
+        if (controller == null)
+        {
+            var player = GameObject.FindWithTag("Player");
+            if (player != null)
+                controller = player.GetComponent<CharacterController>();
+        }
+
         if (inventory == null)
             inventory = GetComponent<PlayerInventory>();
     }
 
     void Update()
     {
+        if (controller == null) return;
+
         if (controller.isGrounded && controller.velocity.magnitude > 0.1f)
         {
             stepTimer += Time.deltaTime;
@@ -46,16 +55,15 @@ public class FootstepSound : MonoBehaviour
 
     void PlayRandomStep()
     {
-        if (stepClips.Length > 0)
-        {
-            int randomIndex = Random.Range(0, stepClips.Length);
-            audioSource.clip = stepClips[randomIndex];
+        if (stepClips == null || stepClips.Length == 0) return;
+        if (audioSource == null) return;
 
-            float weightFactor = (inventory != null) ? Mathf.Clamp01(inventory.TotalWeight / 15f) : 0f;
-            audioSource.pitch = Random.Range(0.8f, 1.2f) - weightFactor * 0.2f;
-            audioSource.volume = Random.Range(0.8f, 1.0f) + weightFactor * 0.15f;
+        int randomIndex = Random.Range(0, stepClips.Length);
+        float weightFactor = (inventory != null) ? Mathf.Clamp01(inventory.TotalWeight / 15f) : 0f;
+        float pitch  = Random.Range(0.8f, 1.2f) - weightFactor * 0.2f;
+        float volume = Random.Range(0.8f, 1.0f) + weightFactor * 0.15f;
 
-            audioSource.Play();
-        }
+        audioSource.pitch = pitch;
+        audioSource.PlayOneShot(stepClips[randomIndex], volume);
     }
-}
+}

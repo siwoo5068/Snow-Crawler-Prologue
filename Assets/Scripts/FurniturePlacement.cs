@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class FurniturePlacement : MonoBehaviour
@@ -15,6 +16,8 @@ public class FurniturePlacement : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip placeSound;
 
+    private static readonly Dictionary<ItemType, Material> _cachedMaterials = new Dictionary<ItemType, Material>();
+
     void Start()
     {
         if (inventory == null)
@@ -25,16 +28,20 @@ public class FurniturePlacement : MonoBehaviour
             audioSource = GetComponent<AudioSource>();
     }
 
+    void OnDestroy()
+    {
+        foreach (var mat in _cachedMaterials.Values)
+            if (mat != null) Object.Destroy(mat);
+        _cachedMaterials.Clear();
+    }
+
     void Update()
     {
         if (survivalTimer == null || inventory == null) return;
-
         if (!survivalTimer.inSafeZone) return;
 
         if (Input.GetKeyDown(placeKey) && inventory.GetItemCount() > 0)
-        {
             PlaceFurniture();
-        }
     }
 
     void PlaceFurniture()
@@ -52,21 +59,31 @@ public class FurniturePlacement : MonoBehaviour
         placed.transform.localScale = GetFurnitureScale(dropped.Value);
         placed.tag = "Untagged";
 
+        var col = placed.GetComponent<Collider>();
+        if (col != null) Object.Destroy(col);
+
         var renderer = placed.GetComponent<Renderer>();
         if (renderer != null)
-        {
-            renderer.material.color = GetFurnitureColor(dropped.Value);
-        }
-
-        // SnowBurial이 붙지 않도록 Untagged (안전지대 내 영구 배치)
-        var col = placed.GetComponent<Collider>();
-        if (col != null) col.enabled = false;
+            renderer.sharedMaterial = GetCachedMaterial(dropped.Value);
 
         if (cabinComfort != null)
             cabinComfort.OnFurniturePlaced(dropped.Value);
 
         if (audioSource != null && placeSound != null)
             audioSource.PlayOneShot(placeSound);
+    }
+
+    Material GetCachedMaterial(ItemType type)
+    {
+        if (_cachedMaterials.TryGetValue(type, out Material mat) && mat != null)
+            return mat;
+
+        var shader = Shader.Find("Universal Render Pipeline/Lit");
+        if (shader == null) shader = Shader.Find("Standard");
+        mat = new Material(shader);
+        mat.color = GetFurnitureColor(type);
+        _cachedMaterials[type] = mat;
+        return mat;
     }
 
     Vector3 GetFurnitureScale(ItemType type)
@@ -90,13 +107,13 @@ public class FurniturePlacement : MonoBehaviour
         switch (type)
         {
             case ItemType.OldChair:    return new Color(0.55f, 0.35f, 0.18f);
-            case ItemType.WoodenTable: return new Color(0.6f, 0.4f, 0.2f);
-            case ItemType.Bookshelf:   return new Color(0.45f, 0.3f, 0.15f);
-            case ItemType.Lantern:     return new Color(1f, 0.85f, 0.4f);
-            case ItemType.HeavyCrate:  return new Color(0.5f, 0.45f, 0.35f);
-            case ItemType.Rug:         return new Color(0.7f, 0.2f, 0.15f);
-            case ItemType.WallClock:   return new Color(0.3f, 0.25f, 0.2f);
-            case ItemType.SmallDrawer: return new Color(0.5f, 0.35f, 0.2f);
+            case ItemType.WoodenTable: return new Color(0.6f,  0.4f,  0.2f);
+            case ItemType.Bookshelf:   return new Color(0.45f, 0.3f,  0.15f);
+            case ItemType.Lantern:     return new Color(1f,    0.85f, 0.4f);
+            case ItemType.HeavyCrate:  return new Color(0.5f,  0.45f, 0.35f);
+            case ItemType.Rug:         return new Color(0.7f,  0.2f,  0.15f);
+            case ItemType.WallClock:   return new Color(0.3f,  0.25f, 0.2f);
+            case ItemType.SmallDrawer: return new Color(0.5f,  0.35f, 0.2f);
             default:                   return Color.gray;
         }
     }

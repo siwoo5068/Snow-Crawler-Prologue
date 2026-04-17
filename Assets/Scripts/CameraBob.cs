@@ -47,6 +47,7 @@ public class CameraBob : MonoBehaviour
             frequency = Mathf.Max(frequency, 4f);
 
             bobTimer += Time.deltaTime * frequency;
+            bobTimer %= Mathf.PI * 2f;
             float bobOffset = Mathf.Sin(bobTimer) * amplitude;
 
             Vector3 pos = transform.localPosition;

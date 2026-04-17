@@ -17,16 +17,27 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
-        cameraTransform = Camera.main.transform;
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+
+        var cam = GetComponentInChildren<Camera>(true);
+        if (cam != null) cameraTransform = cam.transform;
+
+        if (cameraTransform == null && Camera.main != null)
+            cameraTransform = Camera.main.transform;
 
         if (inventory == null)
             inventory = GetComponent<PlayerInventory>();
     }
 
+    void OnEnable()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
     void Update()
     {
+        if (cameraTransform == null) return;
+
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
@@ -46,4 +57,3 @@ public class PlayerController : MonoBehaviour
         controller.SimpleMove(move * speed);
     }
 }
-

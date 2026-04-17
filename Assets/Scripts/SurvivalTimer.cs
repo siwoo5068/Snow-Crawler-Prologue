@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class SurvivalTimer : MonoBehaviour
@@ -7,46 +8,46 @@ public class SurvivalTimer : MonoBehaviour
     public TextMeshProUGUI timerText;
     public GameObject gameOverPanel;
     public TextMeshProUGUI inventoryText;
+    public TextMeshProUGUI gameOverTimeText;
 
     [Header("Survival Settings")]
-    public float maxTime = 10f;
+    public float maxTime = 30f;
     private float currentTime;
     public float TimeRatio { get { return maxTime > 0f ? currentTime / maxTime : 0f; } }
     private bool isDead = false;
     public bool inSafeZone = true;
 
     [Header("Safe Zone Recovery")]
-    public float recoverySpeed = 5f;   // 초당 회복 속도 (5초 = 5초/s)
+    public float recoverySpeed = 8f;
 
     [Header("Materials & Upgrade")]
     public int materialCount = 0;
     public int upgradeLevel = 0;
     public int maxUpgradeLevel = 3;
     public int materialsPerUpgrade = 3;
-    public float timePerUpgrade = 10f;
+    public float timePerUpgrade = 15f;
+
+    private float _sessionStartTime;
 
     void Start()
     {
+        _sessionStartTime = Time.time;
         currentTime = maxTime;
-
-        // 모든 패널 초기화
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
         UpdateInventoryUI();
     }
 
     void Update()
     {
-        // 죽었으면 아무것도 안 함
         if (isDead) return;
 
         if (!inSafeZone)
         {
-            // 안전지대 밖: 시간 깎임
             currentTime -= Time.deltaTime;
             if (timerText != null)
             {
-                timerText.text = "Time: " + currentTime.ToString("F2") + "s";
-                timerText.color = Color.white;
+                timerText.text = "Time: " + currentTime.ToString("F1") + "s";
+                timerText.color = currentTime < maxTime * 0.3f ? Color.red : Color.white;
             }
 
             if (currentTime <= 0)
@@ -57,7 +58,6 @@ public class SurvivalTimer : MonoBehaviour
         }
         else
         {
-            // 안전지대 안: 점진적 회복
             currentTime = Mathf.MoveTowards(currentTime, maxTime, recoverySpeed * Time.deltaTime);
             if (timerText != null)
             {
@@ -75,22 +75,18 @@ public class SurvivalTimer : MonoBehaviour
         }
     }
 
-
-    // 아이템 먹었을 때 시간 추가
     public void AddTime(float bonusTime)
     {
         currentTime += bonusTime;
         if (currentTime > maxTime) currentTime = maxTime;
     }
 
-    // 재료(SupplyBox) 수집
     public void AddMaterial(int amount)
     {
         materialCount += amount;
         UpdateInventoryUI();
     }
 
-    // 작업대에서 호출: 재료를 소모하여 생존 시간 업그레이드
     public void UpgradeCoat()
     {
         if (upgradeLevel >= maxUpgradeLevel)
@@ -128,22 +124,43 @@ public class SurvivalTimer : MonoBehaviour
     void GameOver()
     {
         isDead = true;
+
+        float elapsed = Time.time - _sessionStartTime;
+        int mins = Mathf.FloorToInt(elapsed / 60f);
+        int secs = Mathf.FloorToInt(elapsed % 60f);
+
         if (gameOverPanel != null) gameOverPanel.SetActive(true);
+
+        if (gameOverTimeText != null)
+            gameOverTimeText.text = string.Format("Survived: {0:00}:{1:00}", mins, secs);
+
         Time.timeScale = 0f;
     }
 
-    // R키 재시작 (GameOver 상태에서)
-    void LateUpdate()
+    public void ResetState()
     {
-        if (isDead && Input.GetKeyDown(KeyCode.R))
-        {
-            Time.timeScale = 1f;
-            UnityEngine.SceneManagement.SceneManager.LoadScene(
-                UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
-        }
+        isDead = false;
+        inSafeZone = true;
+        materialCount = 0;
+        upgradeLevel = 0;
+        maxTime = 30f;
+        currentTime = maxTime;
+        _sessionStartTime = Time.time;
+        UpdateInventoryUI();
     }
 
-    // 트리거 감지 (이게 있어야 나갔다 들어올 때 작동해요!)
+    public void RestartGame()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void GoToMainMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(0);
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("SafeZone")) inSafeZone = true;
