@@ -10,6 +10,14 @@ public class CabinComfort : MonoBehaviour
 
     public void OnFurniturePlaced(ItemType type)
     {
-        PlacedCount++;
+        PlacedCount = Mathf.Min(PlacedCount + 1, maxFurnitureCount);
+    }
+
+    /// <summary>
+    /// 설치된 가구를 다시 주웠을 때 호출 – PlacedCount 감소
+    /// </summary>
+    public void OnFurniturePickedUp(ItemType type)
+    {
+        PlacedCount = Mathf.Max(0, PlacedCount - 1);
     }
 }
