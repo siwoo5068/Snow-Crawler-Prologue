@@ -17,6 +17,10 @@ public class SurvivalTimer : MonoBehaviour
     private bool isDead = false;
     public bool inSafeZone = true;
 
+    [Header("Cold Escalation")]
+    [Tooltip("체온 감소 속도 배율 — SortieManager가 출격마다 값을 올립니다")]
+    public float coldMultiplier = 1f;
+
     [Header("Safe Zone Recovery")]
     public float recoverySpeed = 8f;
 
@@ -43,7 +47,7 @@ public class SurvivalTimer : MonoBehaviour
 
         if (!inSafeZone)
         {
-            currentTime -= Time.deltaTime;
+            currentTime -= Time.deltaTime * coldMultiplier;
             if (timerText != null)
             {
                 timerText.text = "Time: " + currentTime.ToString("F1") + "s";
@@ -145,6 +149,7 @@ public class SurvivalTimer : MonoBehaviour
         upgradeLevel = 0;
         maxTime = 30f;
         currentTime = maxTime;
+        coldMultiplier = 1f;
         _sessionStartTime = Time.time;
         UpdateInventoryUI();
     }
