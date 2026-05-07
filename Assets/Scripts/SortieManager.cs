@@ -135,6 +135,14 @@ public class SortieManager : MonoBehaviour
         UpdateHUD();
 
         Debug.Log($"[SortieManager] 🚀 출격 #{_sortieCount} 시작 — coldMultiplier={mult:F2}x");
+
+        if (SubtitleManager.Instance != null)
+        {
+            if (_sortieCount == 1)
+                SubtitleManager.Instance.ShowSubtitle("눈보라가 거세다... 필요한 가구만 빠르게 챙겨야 해.", 4f);
+            else if (_sortieCount == 3)
+                SubtitleManager.Instance.ShowSubtitle("점점 더 추워지는 기분이야... 너무 오래 밖을 맴돌면 위험해.", 4f);
+        }
     }
 
     // ── 귀환 (SafeZone Enter) ─────────────────────────────────────────────
@@ -148,6 +156,11 @@ public class SortieManager : MonoBehaviour
             itemSpawner.RespawnAll();
             Debug.Log($"[SortieManager] 🔄 귀환 #{_returnCount} — 아이템 리스폰 완료");
         }
+
+        if (SaveManager.Instance != null) SaveManager.Instance.SaveGame();
+
+        FlashlightController fc = Object.FindFirstObjectByType<FlashlightController>();
+        if (fc != null) fc.RechargeBattery();
 
         // 다음 출격용 coldMultiplier 계산 (귀환 횟수 기준으로 누적)
         _nextColdMultiplier = Mathf.Min(
