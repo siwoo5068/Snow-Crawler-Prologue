@@ -44,12 +44,24 @@ AI가 이 파일을 읽으면 개발 맥락을 즉시 파악하고 작업을 이
   2. Canvas 밑에 화면 아래쪽에 적당히 TextMeshPro-Text(UI) 생성 후 폰트 설정.
   3. SubtitleManager의 `subtitleText` 칸에 그 텍스트를 드래그해서 넣으면 끝!
 
+### 4. GameDirector.cs (게임 오버 시네마틱 연출 감독 추가)
+- 기존의 밋밋하게 정지하던 게임 오버를 **시네마틱한 죽음 연출**로 업그레이드했습니다.
+- **죽음 연출 흐름:**
+  1. 조작 및 발소리 즉시 마비 (꽁꽁 얼어붙어 움직일 수 없음)
+  2. 긴급 자막 출력: "추위가... 온몸을 덮쳐온다..."
+  3. 눈보라 소리만 들리면서 시야가 서서히 까맣게 암전됨 (눈이 감김)
+  4. 1.5초 후 기존의 생존 시간(게임 오버) 창 팝업.
+- **집에서 씬에 세팅하는 법:**
+  1. 빈 게임오브젝트 `GameDirector` 생성 후 `GameDirector.cs` 부착.
+  2. Canvas 안에 화면을 꽉 채우는 '검은색 Image' 하나 생성 후 Raycast Target 끄기.
+  3. `GameDirector.cs` 컴포넌트에 검은색 Image 연결, 그리고 플레이어의 `PlayerController`, `FootstepSound` 컴포넌트를 빈칸에 드래그해서 넣어주면 끝!
+
 ---
 
 ## 씬에서 아직 해야 할 것 (집에서 할 일)
 
-1. **SaveManager 및 SubtitleManager 오브젝트 씬에 배치**
-   - 빈 게임오브젝트 2개 만들고 각각 스크립트 부착. SubtitleManager는 UI 텍스트 연결!
+1. **SaveManager, SubtitleManager, GameDirector 오브젝트 씬에 배치**
+   - 빈 게임오브젝트 3개 만들고 스크립트 부착 후 UI/플레이어 참조 연결!
 2. **PauseMenu UI & Journal UI 배치**
    - Canvas 안에 패널 배치 (ESC 일시정지, Tab 메모지)
 3. **오디오 에셋 연결 (BGM, 눈보라, 심박수)**
