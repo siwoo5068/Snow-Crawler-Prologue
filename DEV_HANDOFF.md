@@ -1,80 +1,123 @@
-﻿# Snow-Crawler: Prologue -- Dev Handoff
-
-AI가 이 파일을 읽으면 개발 맥락을 즉시 파악하고 작업을 이어갈 수 있습니다.
-
-## 마지막 업데이트
-- 날짜: 2026-05-07 (수), 작업 위치: 학교 PC
+﻿# Snow-Crawler: Prologue — 최종 인수인계 문서
+> 최종 업데이트: 2026-05-07 (수) 학교 PC
+> 이 문서를 AI에게 전달하면 즉시 맥락을 파악하고 작업을 이어갈 수 있습니다.
 
 ---
 
-## [필독] 씬 파일 동기화 문제
+## ⚠️ 절대 주의사항 (AI가 반드시 숙지할 것)
 
-집 PC의 SampleScene.unity 파일이 GitHub에 커밋되지 않은 상태입니다.
-집 PC 씬 = 최신 버전 (테스트 가구 삭제됨, ItemSpawner 있음)
-학교 PC 씬 = 오래된 버전 (테스트 가구 살아있음, ItemSpawner 없음)
-
-### 집에 도착하면 가장 먼저 할 것
-1. git pull (오늘 학교에서 수정한 스크립트 받기)
-2. Unity 열고 씬 덮어쓰지 말기
-3. Ctrl+S 로 씬 저장 후 git add . -> git commit -> git push
-4. 이후로는 씬 파일도 항상 커밋에 포함!
+1. **씬 파일(.unity)은 집 PC의 것이 최신입니다.** 학교에서 씬은 일절 건드리지 않았습니다.
+2. **스크립트(.cs)는 GitHub의 것이 최신입니다.** `git pull`로 받으세요.
+3. 아래 작업들은 전부 **"스크립트(뇌)만 만들어둔 상태"**입니다. 씬에 오브젝트를 배치하고 참조를 연결하는 **"몸 조립"**은 아직 안 했습니다.
+4. **기존에 씬에 이미 붙어있는 스크립트들**(FogManager, FlashlightController, FootstepSound, SortieManager 등)은 코드를 고도화했기 때문에 별도 씬 작업 없이 알아서 새 기능이 적용됩니다.
+5. **새로 만든 스크립트들**(SaveManager, SubtitleManager, GameDirector, HypothermiaHallucination)은 씬에 오브젝트를 만들어 부착해야 합니다.
 
 ---
 
-## 오늘 학교에서 구현한 것 (100% 코드 기반 안전 작업)
+## 🔧 집에 도착하면 할 일 (순서대로)
 
-### 1. SaveManager.cs (신규 파일) + SortieManager 자동저장 연동 완료!
-- 씬에 배치된 모든 가구, 생존 상태, 출격 횟수 저장 로직.
-- **SortieManager.cs 스크립트 수정 완료:** 별장에 귀환하면 자동으로 저장되도록 코드 구현 끝남!
+### 0단계: Git 동기화
+```
+git pull
+Unity 열기 → 씬이 자동 로드됨 → Ctrl+S로 저장 → git add . → git commit → git push
+```
+이 시점부터 씬 파일도 항상 커밋에 포함하세요.
 
-### 2. FootstepSound.cs 고도화 (바닥 재질별 발소리 분리)
-- 기존 단일 발소리에서 **눈밭(Snow)과 나무바닥(Wood)**으로 발소리를 분리하는 코드 작성 완료.
-- 발 밑으로 레이저(Raycast)를 쏴서 밟고 있는 바닥의 Tag를 검사하도록 구현.
-- 유니티 ProjectSettings에 **`Wood` 태그 자동 추가 완료!** (집에 가면 태그가 생겨있음)
+### 1단계: SaveManager 씬 배치
+- 빈 게임오브젝트 생성 → 이름: `SaveManager`
+- `SaveManager.cs` 부착
+- Inspector 참조는 비워둬도 됨 (자동 탐색)
 
-### 3. SubtitleManager.cs (독백 자막 시스템 신규 추가)
-- **영화 같은 페이드인/아웃 연출**과 **대기열(Queue)**을 지원하는 자막 매니저 생성.
-- **이미 연동 완료된 상황:**
-  1. 첫 출격 시: "눈보라가 거세다... 필요한 가구만 빠르게 챙겨야 해."
-  2. 3번째 출격 시: "점점 더 추워지는 기분이야... 너무 오래 밖을 맴돌면 위험해."
-  3. 얼어 죽기 직전(체온 25% 이하): "너무 춥다... 손발의 감각이 사라지고 있어..." (긴급 자막 덮어쓰기 적용)
-  4. 가방 꽉 찼는데 주울 때: "가방이 꽉 차서 더 이상 주울 수 없어..."
-- **집에서 씬에 세팅하는 법:**
-  1. 빈 게임오브젝트 생성 후 `SubtitleManager.cs` 부착.
-  2. Canvas 밑에 화면 아래쪽에 적당히 TextMeshPro-Text(UI) 생성 후 폰트 설정.
-  3. SubtitleManager의 `subtitleText` 칸에 그 텍스트를 드래그해서 넣으면 끝!
+### 2단계: SubtitleManager 씬 배치
+- 빈 게임오브젝트 생성 → 이름: `SubtitleManager`
+- `SubtitleManager.cs` 부착
+- **Canvas 안에 TextMeshPro-Text(UI) 생성:**
+  - 위치: 화면 하단 중앙 (Anchor: bottom-center)
+  - 정렬: Center
+  - 폰트 크기: 24~28 정도
+  - 색상: 흰색
+  - 이름: `SubtitleText`
+- `SubtitleManager` 컴포넌트의 `Subtitle Text` 필드에 위 텍스트를 드래그
 
-### 4. GameDirector.cs (게임 오버 시네마틱 연출 감독 추가)
-- 기존의 밋밋하게 정지하던 게임 오버를 **시네마틱한 죽음 연출**로 업그레이드했습니다.
-- **죽음 연출 흐름:**
-  1. 조작 및 발소리 즉시 마비 (꽁꽁 얼어붙어 움직일 수 없음)
-  2. 긴급 자막 출력: "추위가... 온몸을 덮쳐온다..."
-  3. 눈보라 소리만 들리면서 시야가 서서히 까맣게 암전됨 (눈이 감김)
-  4. 1.5초 후 기존의 생존 시간(게임 오버) 창 팝업.
-- **집에서 씬에 세팅하는 법:**
-  1. 빈 게임오브젝트 `GameDirector` 생성 후 `GameDirector.cs` 부착.
-  2. Canvas 안에 화면을 꽉 채우는 '검은색 Image' 하나 생성 후 Raycast Target 끄기.
-  3. `GameDirector.cs` 컴포넌트에 검은색 Image 연결, 그리고 플레이어의 `PlayerController`, `FootstepSound` 컴포넌트를 빈칸에 드래그해서 넣어주면 끝!
+### 3단계: GameDirector 씬 배치
+- 빈 게임오브젝트 생성 → 이름: `GameDirector`
+- `GameDirector.cs` 부착
+- **Canvas 안에 Image(UI) 생성:**
+  - 색상: 검은색 (R:0, G:0, B:0, A:0 → 투명하게 시작)
+  - Stretch로 화면 꽉 채움
+  - Raycast Target: **끄기**
+  - 이름: `FadeOverlay`
+- `GameDirector` 컴포넌트에 연결:
+  - `Fade Overlay` ← 위의 검은색 Image
+  - `Player Controller` ← 플레이어의 `PlayerController` 컴포넌트
+  - `Footstep Sound` ← 플레이어의 `FootstepSound` 컴포넌트
 
-### 6. FogManager.cs 고도화 (다크 블리자드 + 돌풍 웨이브 시스템)
-- 시야를 가리는 답답함은 줄이고 공포감은 극대화하는 **완급조절용 복합 안개 시스템**을 완성했습니다.
-- **주요 기능:**
-  1. **다크 블리자드 (기저 환경):** 야외로 출격할 때마다 안개가 서서히 짙어지고 색상이 어두운 검푸른색으로 변합니다. 하지만 최대치에 달해도 손전등을 켜면 충분히 파밍이 가능할 정도로만 시야가 제한됩니다.
-  2. **돌풍 웨이브 (랜덤 이벤트):** 야외에 머무는 동안 무작위 간격(약 45~75초)으로 거대한 돌풍이 덮칩니다.
-     - 전조 증상: *"갑자기 바람 소리가 멎었다... 불길한 침묵이다."* 같은 소름 돋는 자막이 긴급하게 뜹니다.
-     - 화이트아웃: 자막과 함께 약 12초 동안 안개가 순식간에 새하얗고 짙게 변해 시야를 100% 차단합니다. (손전등도 무용지물)
-     - 이 시간 동안 플레이어는 파밍을 멈추고 웅크린 채 공포를 견뎌야 합니다. 폭풍이 끝나면 원래의 시야로 서서히 돌아옵니다.
-  3. **별장 귀환 시 완전 초기화:** 별장에 들어가면 돌풍 타이머가 즉시 리셋되며 아늑한 옅은 안개로 돌아옵니다.
-- **집에서 씬에 세팅하는 법:**
-  1. 기존 `FogManager`가 이미 부착되어 있다면 아무것도 안 건드려도 알아서 작동합니다! (자막, 출격 횟수 모두 자동 연동 완료)
+### 4단계: HypothermiaHallucination 씬 배치
+- **플레이어 게임오브젝트**에 `HypothermiaHallucination.cs` 부착 (새 오브젝트 불필요)
+- Inspector의 `Fake Footsteps` 배열에 발소리 오디오 클립 2~3개 넣기
+  - 기존 눈밭 발소리 클립을 그대로 넣어도 됨 (피치가 랜덤으로 변조됨)
+- 나머지 참조(SurvivalTimer, Camera)는 자동 탐색
 
+### 5단계: 확인만 하면 되는 것들 (추가 작업 불필요)
+| 스크립트 | 상태 | 왜 작업 불필요? |
+|---|---|---|
+| FlashlightController.cs | 고도화 완료 | 이미 플레이어에 붙어있음. 배터리/깜빡임 자동 적용 |
+| FogManager.cs | 고도화 완료 | 이미 씬에 붙어있음. 돌풍 웨이브 자동 적용 |
+| FootstepSound.cs | 고도화 완료 | 이미 플레이어에 붙어있음. Wood 태그 바닥 자동 감지 |
+| SortieManager.cs | 수정 완료 | 이미 씬에 붙어있음. 자동저장/배터리충전/자막 연동 |
+| SurvivalTimer.cs | 수정 완료 | GameDirector/SubtitleManager 연동 코드 추가됨 |
 
-### 7. HypothermiaHallucination.cs (저체온증 환각 시스템)
-- 생존 시간(체온)이 15초 이하로 떨어져 죽음이 임박하면, 극한의 공포를 유발하는 **저체온증 환각 연출**이 시작됩니다.
-- **주요 기능:**
-  1. **시각적 공포:** 심장 박동처럼 카메라의 시야각(FOV)이 쿵.. 쿵.. 하고 울렁거립니다. 죽음에 가까워질수록 울렁거림이 더 빨라지고 심해집니다.
-  2. **청각적 공포:** 플레이어의 바로 등 뒤에서 낯선 발소리(Fake Footsteps)나 기괴한 이명이 들려옵니다.
-  3. **심리적 자막:** *"갑자기... 몸이 왜 이렇게 따뜻하지?"*, *"누가 내 뒤에 있는 것 같아..."* 같은 환각 텍스트가 지속적으로 뜹니다.
-- **집에서 씬에 세팅하는 법:**
-  1. 플레이어 게임오브젝트에 `HypothermiaHallucination.cs`를 부착합니다.
-  2. Inspector의 `Fake Footsteps` 배열에 플레이어의 발소리 오디오 클립들이나 귀신 소리 등을 몇 개 채워 넣어주세요. (나머지는 스크립트가 알아서 등 뒤로 위치를 옮기며 재생합니다)
+---
+
+## 📋 오늘 구현한 전체 기능 목록
+
+### 신규 스크립트 (씬 배치 필요)
+1. **SaveManager.cs** — 가구 배치/생존 상태/출격 횟수를 JSON으로 저장/복원. 귀환 시 자동 저장.
+2. **SubtitleManager.cs** — 페이드 인/아웃 자막 큐 시스템. 긴급(urgent) 메시지 덮어쓰기 지원.
+3. **GameDirector.cs** — 시네마틱 게임오버 연출. 조작 마비 → 자막 → 화면 암전 → 결과창.
+4. **HypothermiaHallucination.cs** — 체온 15초 이하 시 FOV 울렁거림 + 등 뒤 가짜 발소리 + 환각 자막.
+
+### 기존 스크립트 고도화 (씬 배치 불필요)
+5. **FlashlightController.cs** — 배터리 소모(약 1분 지속) + 20% 이하 깜빡임 + 방전 시 강제 꺼짐 + 귀환 시 자동 100% 충전.
+6. **FogManager.cs** — 출격 횟수 비례 다크 블리자드 + 45~75초 주기 랜덤 돌풍 화이트아웃(12초).
+7. **FootstepSound.cs** — Raycast로 바닥 태그 감지, 눈밭/나무바닥 발소리 분리.
+
+### 기존 스크립트 연동 수정
+8. **SortieManager.cs** — 귀환 시 SaveManager.SaveGame() 호출 + FlashlightController.RechargeBattery() 호출 + 출격 자막 트리거.
+9. **SurvivalTimer.cs** — 체온 25% 이하 시 SubtitleManager 경고 자막 + GameOver 시 GameDirector 시네마틱 호출 + timeRemaining 프로퍼티 추가.
+10. **PlayerInventory.cs** — 가방 초과 시 SubtitleManager 경고 자막 트리거.
+
+---
+
+## 🤖 집에서 AI에게 보낼 프롬프트 (복사+붙여넣기)
+
+아래 텍스트를 그대로 복사해서 집에 있는 AI에게 전달하세요:
+
+---
+
+> 안녕! 이 프로젝트의 `DEV_HANDOFF.md` 파일을 분석해서 맥락을 완전히 숙지해 줘.
+>
+> **중요:** 이 문서에 적힌 것은 학교에서 스크립트(코드)만 짜둔 거야. 씬 파일은 건드리지 않았어.
+> 지금 내 PC(집)의 씬이 최신이고, `git pull`은 이미 했어.
+>
+> 너는 MCP 툴(mcp_unityMCP)을 사용해서 아래 작업을 순서대로 해줘:
+>
+> 1. **SaveManager 배치:** 씬에 빈 게임오브젝트 `SaveManager` 만들고 `SaveManager.cs` 부착
+> 2. **SubtitleManager 배치:** 빈 게임오브젝트 `SubtitleManager` 만들고 `SubtitleManager.cs` 부착. Canvas 안에 TextMeshPro-Text(UI)를 만들어서 `subtitleText` 필드에 연결해 줘. (화면 하단 중앙, 흰색, 24pt)
+> 3. **GameDirector 배치:** 빈 게임오브젝트 `GameDirector` 만들고 `GameDirector.cs` 부착. Canvas 안에 화면 꽉 채우는 검은색 Image(Alpha=0) 만들어서 `fadeOverlay`에 연결. 그리고 플레이어의 `PlayerController`와 `FootstepSound`를 찾아서 각각 `playerController`, `footstepSound` 필드에 연결해 줘.
+> 4. **HypothermiaHallucination 배치:** 플레이어 게임오브젝트에 `HypothermiaHallucination.cs` 부착. `fakeFootsteps` 배열은 비워둬도 돼 (나중에 내가 오디오 넣을게).
+> 5. **이미 씬에 붙어있는 FogManager, FlashlightController, FootstepSound, SortieManager는 절대 건드리지 마.** 코드만 업데이트된 거라 알아서 작동해.
+>
+> 작업이 끝나면 씬을 저장(Ctrl+S)하고, 다음에 뭘 할지 알려줘!
+
+---
+
+## ✅ 체크리스트 (전부 완료되면 게임 플레이 가능)
+
+- [ ] git pull 완료
+- [ ] 씬 저장 후 커밋/푸시 (씬 동기화)
+- [ ] SaveManager 씬 배치
+- [ ] SubtitleManager 씬 배치 + UI 텍스트 연결
+- [ ] GameDirector 씬 배치 + UI Image + 플레이어 참조 연결
+- [ ] HypothermiaHallucination 플레이어에 부착
+- [ ] 플레이 테스트: 별장 밖으로 나가서 자막/안개/손전등/환각 확인
