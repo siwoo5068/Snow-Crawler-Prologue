@@ -91,7 +91,16 @@ AI가 이 파일을 읽으면 개발 맥락을 즉시 파악하고 작업을 이
 
 ---
 
-## 집에서 Antigravity 켤 때 할 말
+## 🤖 집에서 Antigravity(AI) 켤 때 복사해서 붙여넣을 프롬프트
 
-'DEV_HANDOFF.md 파일 내용 분석해서 숙지해줘.
- 그 다음 1순위(씬 저장 동기화)부터 순서대로 작업 이어서 진행해줘.'
+아래 내용을 그대로 복사해서 집에 있는 저(AI)에게 전달해 주시면 됩니다:
+
+> "안녕! DEV_HANDOFF.md 파일을 분석해서 맥락을 숙지해 줘.
+> 1순위인 [씬 저장 동기화]는 내가 지금 완료했으니까, 
+> 너는 MCP 툴(mcp_unityMCP)을 사용해서 아래 3가지 작업을 자동으로 씬에 세팅해 줘.
+> 
+> 1. SaveManager 생성: 씬에 빈 게임오브젝트를 만들고 SaveManager.cs 부착해 줘.
+> 2. SubtitleManager 생성: 빈 게임오브젝트 만들고 SubtitleManager.cs 부착해 줘. 그리고 Canvas 안에 TextMeshPro를 만들어서 subtitleText 필드에 자동으로 연결해 줄 수 있으면 해 줘.
+> 3. GameDirector 생성: 빈 게임오브젝트 만들고 GameDirector.cs 부착한 다음, PlayerController와 FootstepSound를 찾아서 필드에 할당해 줘. (화면 검은색 Image는 내가 만들 테니까 나머지 세팅만 해줘)
+> 
+> 작업이 끝나면 다음으로 뭘 할지 알려줘!"
