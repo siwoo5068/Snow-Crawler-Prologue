@@ -53,6 +53,13 @@ public class SortieManager : MonoBehaviour
     public TextMeshProUGUI sortieHUDText;
 
     // ── 내부 상태 ─────────────────────────────────────────────────────────
+    /// <summary>총 출격 횟수 — SaveManager가 저장/복원합니다.</summary>
+    public int SortieCount
+    {
+        get => _sortieCount;
+        set => _sortieCount = value;
+    }
+
     private int   _sortieCount  = 0;   // 총 출격 횟수 (SafeZone Exit 기준)
     private int   _returnCount  = 0;   // 총 귀환 횟수 (SafeZone Enter 기준)
     private float _nextColdMultiplier; // 다음 출격에 적용될 배율 (귀환 시 계산)
