@@ -16,12 +16,16 @@
 
 ## 🔧 집에 도착하면 할 일 (순서대로)
 
-### 0단계: Git 동기화
+### 0단계: Git 동기화 (⚠️ 씬 백업 먼저!)
 ```
-git pull
-Unity 열기 → 씬이 자동 로드됨 → Ctrl+S로 저장 → git add . → git commit → git push
+1. Unity를 닫은 상태에서 시작
+2. 씬 파일 백업: Assets/Scenes/SampleScene.unity → 바탕화면에 복사해두기
+3. git pull  (스크립트만 내려옴, 씬은 안 건드림)
+4. Unity 열기 → 씬이 자동 로드됨 → Ctrl+S로 저장
+5. git add . → git commit -m "씬+스크립트 동기화" → git push
 ```
-이 시점부터 씬 파일도 항상 커밋에 포함하세요.
+> ⚠️ 만약 git pull 후 씬이 이상하면 바탕화면 백업 파일을 되돌려놓으면 됩니다.
+> 학교에서 씬은 일절 커밋하지 않았으므로 정상적이라면 pull로 씬이 변하지 않습니다.
 
 ### 1단계: SaveManager 씬 배치
 - 빈 게임오브젝트 생성 → 이름: `SaveManager`
