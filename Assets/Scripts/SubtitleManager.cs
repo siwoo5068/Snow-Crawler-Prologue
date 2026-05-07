@@ -15,16 +15,15 @@ public class SubtitleManager : MonoBehaviour
 {
     public static SubtitleManager Instance { get; private set; }
 
-    [Header("UI References")]
-    [Tooltip("자막을 띄울 텍스트 컴포넌트")]
+    [Header("UI")]
     public TextMeshProUGUI subtitleText;
-    
-    [Header("Settings")]
-    public float fadeDuration = 0.8f; // 서서히 나타나고 사라지는 시간
 
-    private Queue<SubtitleMessage> messageQueue = new Queue<SubtitleMessage>();
-    private Coroutine currentCoroutine;
-    private bool isPlaying = false;
+    [Header("Settings")]
+    public float fadeDuration = 0.8f;
+
+    private readonly Queue<SubtitleMessage> _messageQueue = new Queue<SubtitleMessage>();
+    private Coroutine _currentCoroutine;
+    private bool _isPlaying;
 
     void Awake()
     {
@@ -40,45 +39,34 @@ public class SubtitleManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 영화 같은 자막을 화면에 띄웁니다.
-    /// </summary>
-    /// <param name="message">출력할 대사</param>
-    /// <param name="duration">화면에 떠 있는 시간</param>
-    /// <param name="urgent">true일 경우 다른 대사를 무시하고 즉시 덮어씌움</param>
     public void ShowSubtitle(string message, float duration = 3f, bool urgent = false)
     {
-        SubtitleMessage msg = new SubtitleMessage { text = message, duration = duration, urgent = urgent };
+        var msg = new SubtitleMessage { text = message, duration = duration, urgent = urgent };
 
         if (urgent)
         {
-            messageQueue.Clear();
-            if (currentCoroutine != null) StopCoroutine(currentCoroutine);
-            currentCoroutine = StartCoroutine(PlaySubtitleRoutine(msg));
+            _messageQueue.Clear();
+            if (_currentCoroutine != null) StopCoroutine(_currentCoroutine);
+            _currentCoroutine = StartCoroutine(PlaySubtitleRoutine(msg));
         }
         else
         {
-            messageQueue.Enqueue(msg);
-            if (!isPlaying)
-            {
-                currentCoroutine = StartCoroutine(ProcessQueueRoutine());
-            }
+            _messageQueue.Enqueue(msg);
+            if (!_isPlaying)
+                _currentCoroutine = StartCoroutine(ProcessQueueRoutine());
         }
     }
 
     private IEnumerator ProcessQueueRoutine()
     {
-        isPlaying = true;
-
-        while (messageQueue.Count > 0)
+        _isPlaying = true;
+        while (_messageQueue.Count > 0)
         {
-            SubtitleMessage msg = messageQueue.Dequeue();
-            yield return StartCoroutine(PlaySubtitleRoutine(msg));
-            yield return new WaitForSeconds(0.3f); // 대사 사이 숨 고르기
+            yield return StartCoroutine(PlaySubtitleRoutine(_messageQueue.Dequeue()));
+            yield return new WaitForSeconds(0.3f);
         }
-
-        isPlaying = false;
-        currentCoroutine = null;
+        _isPlaying = false;
+        _currentCoroutine = null;
     }
 
     private IEnumerator PlaySubtitleRoutine(SubtitleMessage msg)
@@ -86,10 +74,10 @@ public class SubtitleManager : MonoBehaviour
         if (subtitleText == null) yield break;
 
         subtitleText.text = msg.text;
+        Color c = subtitleText.color;
 
         // Fade In
         float elapsed = 0f;
-        Color c = subtitleText.color;
         while (elapsed < fadeDuration)
         {
             elapsed += Time.deltaTime;
@@ -100,7 +88,6 @@ public class SubtitleManager : MonoBehaviour
         c.a = 1f;
         subtitleText.color = c;
 
-        // 읽을 시간 주기
         yield return new WaitForSeconds(msg.duration);
 
         // Fade Out
