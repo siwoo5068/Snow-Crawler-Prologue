@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 
@@ -129,6 +129,14 @@ public class SurvivalTimer : MonoBehaviour
     void GameOver()
     {
         isDead = true;
+
+        // 카메라 회전 + 이동 완전 차단
+        var pc = GetComponent<PlayerController>();
+        if (pc != null) pc.enabled = false;
+
+        // 마우스 커서 표시 (UI 버튼 클릭 가능)
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
 
         float elapsed = Time.time - _sessionStartTime;
         int mins = Mathf.FloorToInt(elapsed / 60f);
