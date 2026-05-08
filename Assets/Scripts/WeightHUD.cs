@@ -34,11 +34,11 @@ public class WeightHUD : MonoBehaviour
         int count = inventory.GetItemCount();
 
         weightText.text = count > 0
-            ? string.Format("Weight: {0:F1} / {1:F0} kg  ({2})", weight, inventory.maxWeight, count)
-            : "Weight: Empty";
+            ? string.Format("무게: {0:F1} / {1:F0} kg  ({2}개)", weight, inventory.maxWeight, count)
+            : "무게: 비어있음";
 
         if (weight >= inventory.maxWeight)
-            weightText.text += "  [MAX]";
+            weightText.text += "  [최대]";
 
         float ratio = Mathf.Clamp01(weight / dangerWeight);
 
@@ -50,7 +50,7 @@ public class WeightHUD : MonoBehaviour
         if (dropHintText != null)
         {
             if (weight >= inventory.maxWeight && count > 0)
-                dropHintText.text = "<color=#FF6B6B>[G] Drop item to move faster</color>";
+                dropHintText.text = "<color=#FF6B6B>[G] 아이템을 내려놓으면 빨라집니다</color>";
             else
                 dropHintText.text = "";
         }

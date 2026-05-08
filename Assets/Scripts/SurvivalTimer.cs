@@ -53,7 +53,7 @@ public class SurvivalTimer : MonoBehaviour
             currentTime -= Time.deltaTime * coldMultiplier;
             if (timerText != null)
             {
-                timerText.text = "Time: " + currentTime.ToString("F1") + "s";
+                timerText.text = "체온: " + currentTime.ToString("F1") + "초";
                 timerText.color = currentTime < maxTime * 0.3f ? Color.red : Color.white;
             }
 
@@ -85,12 +85,12 @@ public class SurvivalTimer : MonoBehaviour
             {
                 if (currentTime >= maxTime)
                 {
-                    timerText.text = "Safe";
+                    timerText.text = "별장";
                     timerText.color = Color.green;
                 }
                 else
                 {
-                    timerText.text = string.Format("Warming... {0:F0}s", currentTime);
+                    timerText.text = string.Format("체온 회복중... {0:F0}초", currentTime);
                     timerText.color = Color.yellow;
                 }
             }
@@ -137,8 +137,8 @@ public class SurvivalTimer : MonoBehaviour
         if (inventoryText != null)
         {
             string upgradeInfo = upgradeLevel < maxUpgradeLevel
-                ? string.Format("Material: {0} / {1}", materialCount, materialsPerUpgrade)
-                : string.Format("Material: {0} [MAX]", materialCount);
+                ? string.Format("코트 재료: {0} / {1}", materialCount, materialsPerUpgrade)
+                : string.Format("코트 재료: {0} [MAX]", materialCount);
             inventoryText.text = upgradeInfo;
         }
     }
