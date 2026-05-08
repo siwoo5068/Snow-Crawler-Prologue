@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 
@@ -13,6 +13,7 @@ public class SurvivalTimer : MonoBehaviour
     [Header("Survival Settings")]
     public float maxTime = 30f;
     private float currentTime;
+    public float timeRemaining => currentTime;
     public float TimeRatio { get { return maxTime > 0f ? currentTime / maxTime : 0f; } }
     private bool isDead = false;
     public bool inSafeZone = true;

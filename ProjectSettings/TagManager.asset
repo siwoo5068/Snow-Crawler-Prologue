@@ -11,6 +11,7 @@ TagManager:
   - CraftingTable
   - ExitPoint
   - FurnitureItem
+  - Wood
   layers:
   - Default
   - TransparentFX

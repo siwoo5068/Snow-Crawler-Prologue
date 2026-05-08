@@ -2461,6 +2461,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   itemType: 1
+  sourcePrefab: {fileID: 0}
+  sourceScale: {x: 1, y: 1, z: 1}
 --- !u!23 &636888489
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2587,6 +2589,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   itemType: 6
+  sourcePrefab: {fileID: 0}
+  sourceScale: {x: 1, y: 1, z: 1}
 --- !u!23 &697997878
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -8040,6 +8044,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   itemType: 3
+  sourcePrefab: {fileID: 0}
+  sourceScale: {x: 1, y: 1, z: 1}
 --- !u!135 &929596847
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -9247,6 +9253,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   itemType: 5
+  sourcePrefab: {fileID: 0}
+  sourceScale: {x: 1, y: 1, z: 1}
 --- !u!23 &1245055344
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -10872,6 +10880,7 @@ MonoBehaviour:
   gameOverTimeText: {fileID: 164217864}
   maxTime: 30
   inSafeZone: 0
+  coldMultiplier: 1
   recoverySpeed: 8
   materialCount: 0
   upgradeLevel: 0
@@ -10894,6 +10903,7 @@ MonoBehaviour:
   timer: {fileID: 1610321898}
   inventory: {fileID: 1610321901}
   gameProgress: {fileID: 601470030}
+  cabinComfort: {fileID: 0}
 --- !u!54 &1610321900
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -11185,6 +11195,7 @@ MonoBehaviour:
   cabinComfort: {fileID: 830682042}
   placeDistance: 2
   placeKey: 113
+  ghostMaterial: {fileID: 0}
   audioSource: {fileID: 1610321896}
   placeSound: {fileID: 0}
 --- !u!21 &1658369605
@@ -12489,9 +12500,9 @@ GameObject:
   - component: {fileID: 1973968236}
   - component: {fileID: 1973968235}
   - component: {fileID: 1973968234}
+  - component: {fileID: 1973968231}
   - component: {fileID: 1973968233}
   - component: {fileID: 1973968232}
-  - component: {fileID: 1973968231}
   m_Layer: 0
   m_Name: MenuVirtualCamera
   m_TagString: Untagged
@@ -12849,6 +12860,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   itemType: 7
+  sourcePrefab: {fileID: 0}
+  sourceScale: {x: 1, y: 1, z: 1}
 --- !u!23 &2038918877
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -13289,6 +13302,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   itemType: 2
+  sourcePrefab: {fileID: 0}
+  sourceScale: {x: 1, y: 1, z: 1}
 --- !u!23 &2100203329
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -13527,6 +13542,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   itemType: 4
+  sourcePrefab: {fileID: 0}
+  sourceScale: {x: 1, y: 1, z: 1}
 --- !u!65 &2115974398
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -13653,6 +13670,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   itemType: 0
+  sourcePrefab: {fileID: 0}
+  sourceScale: {x: 1, y: 1, z: 1}
 --- !u!65 &2130835523
 BoxCollider:
   m_ObjectHideFlags: 0
