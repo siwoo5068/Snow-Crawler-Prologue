@@ -33,6 +33,8 @@ public class SurvivalTimer : MonoBehaviour
     public float timePerUpgrade = 15f;
 
     private float _sessionStartTime;
+    private bool _warned50;
+    private bool _warned25;
 
     void Start()
     {
@@ -53,6 +55,21 @@ public class SurvivalTimer : MonoBehaviour
             {
                 timerText.text = "Time: " + currentTime.ToString("F1") + "s";
                 timerText.color = currentTime < maxTime * 0.3f ? Color.red : Color.white;
+            }
+
+            // 체온 경고 자막
+            float ratio = currentTime / maxTime;
+            if (ratio <= 0.5f && !_warned50)
+            {
+                _warned50 = true;
+                if (SubtitleManager.Instance != null)
+                    SubtitleManager.Instance.ShowSubtitle("몸이 점점 굳어간다... 빨리 돌아가야 해.", 3f);
+            }
+            if (ratio <= 0.25f && !_warned25)
+            {
+                _warned25 = true;
+                if (SubtitleManager.Instance != null)
+                    SubtitleManager.Instance.ShowSubtitle("더 이상은 위험해...! 지금 당장 별장으로!", 3f, true);
             }
 
             if (currentTime <= 0)
@@ -159,6 +176,8 @@ public class SurvivalTimer : MonoBehaviour
         maxTime = 30f;
         currentTime = maxTime;
         coldMultiplier = 1f;
+        _warned50 = false;
+        _warned25 = false;
         _sessionStartTime = Time.time;
         UpdateInventoryUI();
     }

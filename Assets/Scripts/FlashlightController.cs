@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class FlashlightController : MonoBehaviour
 {
@@ -13,8 +13,8 @@ public class FlashlightController : MonoBehaviour
     [Header("Battery")]
     public float maxBattery = 100f;
     public float currentBattery;
-    public float drainRate = 1.5f;
-    public float flickerThreshold = 20f;
+    public float drainRate = 4.5f;
+    public float flickerThreshold = 30f;
 
     private float _originalIntensity;
     private bool _hasShownWarning;
