@@ -6,7 +6,6 @@ public class InteractionPrompt : MonoBehaviour
     [Header("References")]
     public SurvivalTimer survivalTimer;
     public PlayerInventory inventory;
-    public GameProgress gameProgress;
 
     [Header("UI")]
     public TextMeshProUGUI promptText;
@@ -26,14 +25,6 @@ public class InteractionPrompt : MonoBehaviour
             survivalTimer = GetComponent<SurvivalTimer>();
         if (inventory == null)
             inventory = GetComponent<PlayerInventory>();
-        if (gameProgress == null)
-        {
-#if UNITY_2023_1_OR_NEWER
-            gameProgress = Object.FindAnyObjectByType<GameProgress>();
-#else
-            gameProgress = Object.FindObjectOfType<GameProgress>();
-#endif
-        }
 
         if (promptText != null)
             promptText.text = "";
@@ -126,33 +117,6 @@ public class InteractionPrompt : MonoBehaviour
                         return string.Format("[Workbench] Not enough materials  ({0}/{1})", mat, need);
                 }
                 return "[Workbench] Collect more materials";
-            }
-            else if (tag == "ExitPoint")
-            {
-                if (gameProgress != null && survivalTimer != null)
-                {
-                    bool coatOk    = survivalTimer.upgradeLevel >= gameProgress.requiredUpgradeLevel;
-                    bool comfortOk = gameProgress.cabinComfort != null
-                        && gameProgress.cabinComfort.ComfortRatio >= gameProgress.requiredComfortRatio;
-
-                    if (coatOk && comfortOk)
-                        return "<color=#FFD700>[E] Radio  — Call for Rescue</color>";
-
-                    string coat = coatOk
-                        ? "Coat: OK"
-                        : string.Format("Coat: Lv.{0} needed", gameProgress.requiredUpgradeLevel);
-
-                    int placed = gameProgress.cabinComfort != null ? gameProgress.cabinComfort.PlacedCount : 0;
-                    int needed = gameProgress.cabinComfort != null
-                        ? Mathf.CeilToInt(gameProgress.cabinComfort.maxFurnitureCount * gameProgress.requiredComfortRatio)
-                        : 0;
-                    string comfort = comfortOk
-                        ? "Cabin: Ready"
-                        : string.Format("Cabin: {0}/{1} furniture", placed, needed);
-
-                    return string.Format("[Radio] Not ready  ({0}  /  {1})", coat, comfort);
-                }
-                return "[E] Radio";
             }
         }
 

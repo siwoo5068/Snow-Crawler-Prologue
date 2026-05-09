@@ -60,6 +60,7 @@ public class EndingManager : MonoBehaviour
     private bool _endingStarted = false;
     private bool _finalSortieActive = false;
     private GameObject _beaconInstance;
+    private RadioStatic _radioStatic;   // 별장 Radio 치지직 잡음
 
     public bool IsAct2 => _act2Triggered;
     public bool IsFinalSortie => _finalSortieActive;
@@ -84,6 +85,15 @@ public class EndingManager : MonoBehaviour
             fogManager = Object.FindFirstObjectByType<FogManager>();
         if (atmosphereManager == null)
             atmosphereManager = Object.FindFirstObjectByType<AtmosphereManager>();
+
+        // Radio 오브젝트 탐색 + RadioStatic 자동 부착
+        var radioObj = GameObject.FindWithTag("ExitPoint");
+        if (radioObj != null)
+        {
+            _radioStatic = radioObj.GetComponent<RadioStatic>();
+            if (_radioStatic == null)
+                _radioStatic = radioObj.AddComponent<RadioStatic>();
+        }
 
         // 안락도 변화 이벤트 구독
         if (cabinComfort != null)
@@ -169,16 +179,19 @@ public class EndingManager : MonoBehaviour
 
         var sub = SubtitleManager.Instance;
 
-        // 1단계: 라디오 잡음
+        // 1단계: Radio에서 치지직 잡음 시작
+        if (_radioStatic != null)
+            _radioStatic.TriggerStatic(20f, 3f); // 20초 재생 후 3초 페이드아웃
+
         yield return new WaitForSeconds(2f);
         if (sub != null)
             sub.ShowSubtitle("...라디오에서 잡음이 들려온다...", 3f, true);
 
         yield return new WaitForSeconds(4f);
 
-        // 2단계: 구조대 교신
+        // 2단계: 구조대 교신 (끊기는 느낌)
         if (sub != null)
-            sub.ShowSubtitle("\"여기는 구조대... 좌표를 보내라. 반복한다, 좌표를...\"", 5f, true);
+            sub.ShowSubtitle("\"....여기는... 구조대... 좌표를 보내라... 반복한다...\"", 5f, true);
 
         yield return new WaitForSeconds(6f);
 

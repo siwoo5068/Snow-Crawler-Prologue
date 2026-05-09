@@ -5,18 +5,12 @@ public class Interaction : MonoBehaviour
     public float interactRange = 3f;
     public SurvivalTimer timer;
     public PlayerInventory inventory;
-    public GameProgress gameProgress;
     public CabinComfort cabinComfort;   // 줍기 시 배치 카운트 동기화
 
     void Start()
     {
         if (timer == null) timer = GetComponent<SurvivalTimer>();
         if (inventory == null) inventory = GetComponent<PlayerInventory>();
-#if UNITY_2023_1_OR_NEWER
-        if (gameProgress == null) gameProgress = Object.FindAnyObjectByType<GameProgress>();
-#else
-        if (gameProgress == null) gameProgress = Object.FindObjectOfType<GameProgress>();
-#endif
     }
 
     void Update()
@@ -40,8 +34,7 @@ public class Interaction : MonoBehaviour
             if (hitCollider.CompareTag("FurnitureItem") ||
                 hitCollider.CompareTag("TimeItem") ||
                 hitCollider.CompareTag("MaterialItem") ||
-                hitCollider.CompareTag("CraftingTable") ||
-                hitCollider.CompareTag("ExitPoint"))
+                hitCollider.CompareTag("CraftingTable"))
             {
                 float distance = Vector3.Distance(radarCenter, hitCollider.transform.position);
                 if (distance < minDistance)
@@ -67,10 +60,6 @@ public class Interaction : MonoBehaviour
         else if (closestCollider.CompareTag("CraftingTable"))
         {
             if (timer != null) timer.UpgradeCoat();
-        }
-        else if (closestCollider.CompareTag("ExitPoint"))
-        {
-            if (gameProgress != null) gameProgress.TryWin();
         }
         else if (closestCollider.CompareTag("FurnitureItem"))
         {
