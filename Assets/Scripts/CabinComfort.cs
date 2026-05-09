@@ -8,9 +8,15 @@ public class CabinComfort : MonoBehaviour
     public int PlacedCount { get; private set; }
     public float ComfortRatio { get { return maxFurnitureCount > 0 ? (float)PlacedCount / maxFurnitureCount : 0f; } }
 
+    /// <summary>
+    /// 안락도 변화 시 호출되는 이벤트. EndingManager가 구독하여 2막 트리거 판정에 사용.
+    /// </summary>
+    public event System.Action<float> OnComfortChanged;
+
     public void OnFurniturePlaced(ItemType type)
     {
         PlacedCount = Mathf.Min(PlacedCount + 1, maxFurnitureCount);
+        OnComfortChanged?.Invoke(ComfortRatio);
     }
 
     /// <summary>
@@ -19,5 +25,6 @@ public class CabinComfort : MonoBehaviour
     public void OnFurniturePickedUp(ItemType type)
     {
         PlacedCount = Mathf.Max(0, PlacedCount - 1);
+        OnComfortChanged?.Invoke(ComfortRatio);
     }
 }

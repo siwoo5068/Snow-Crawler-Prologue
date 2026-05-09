@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using TMPro;
 
 public class SortieManager : MonoBehaviour
@@ -6,6 +6,8 @@ public class SortieManager : MonoBehaviour
     [Header("References")]
     public SurvivalTimer survivalTimer;
     public ItemSpawner itemSpawner;
+
+    private EndingManager _endingManager;
 
     [Header("Cold Escalation")]
     public float initialColdMultiplier = 1f;
@@ -37,6 +39,8 @@ public class SortieManager : MonoBehaviour
         if (itemSpawner == null)
             itemSpawner = Object.FindFirstObjectByType<ItemSpawner>();
 
+        _endingManager = Object.FindFirstObjectByType<EndingManager>();
+
         _nextColdMultiplier = initialColdMultiplier;
         ApplyColdMultiplier(initialColdMultiplier);
         UpdateHUD();
@@ -64,11 +68,22 @@ public class SortieManager : MonoBehaviour
     {
         _sortieCount++;
 
+        // 2막: 마지막 출격 감지 → 극한 환경 적용
+        if (_endingManager != null && _endingManager.IsAct2 && !_endingManager.IsFinalSortie)
+        {
+            _endingManager.ActivateFinalSortie();
+            if (SubtitleManager.Instance != null)
+                SubtitleManager.Instance.ShowSubtitle("이번이 마지막이다... 중계기를 찾아야 해.", 5f, true);
+        }
+
         float mult = (skipEscalationOnFirstSortie && _sortieCount == 1)
             ? initialColdMultiplier
             : _nextColdMultiplier;
 
-        ApplyColdMultiplier(mult);
+        // 마지막 출격이면 EndingManager가 coldMultiplier를 직접 제어하므로 덮어쓰지 않음
+        if (_endingManager == null || !_endingManager.IsFinalSortie)
+            ApplyColdMultiplier(mult);
+
         UpdateHUD();
 
         if (SubtitleManager.Instance != null)
