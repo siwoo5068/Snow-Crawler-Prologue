@@ -12399,9 +12399,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce51b07b08d7dda45a6e14c004aca37c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RadioStatic
-  staticVolume: 0.4
-  toneChance: 0.002
-  toneFrequency: 800
+  radioStaticClip: {fileID: 0}
+  maxVolume: 0.5
 --- !u!82 &1711573945
 AudioSource:
   m_ObjectHideFlags: 0
