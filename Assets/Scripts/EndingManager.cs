@@ -1,5 +1,7 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 // =============================================================================
 //  EndingManager — 2막 "새벽이 온다" 시스템
@@ -41,6 +43,17 @@ public class EndingManager : MonoBehaviour
     public float finalColdMultiplier = 3f;
     public float finalBlizzardInterval = 15f;
 
+    // ── PROLOGUE END UI ──────────────────────────────────────────────────
+    [Header("Ending UI")]
+    [Tooltip("프롤로그 엔딩 패널 (비활성 상태로 씬에 배치)")]
+    public GameObject prologueEndPanel;
+    [Tooltip("생존 시간 텍스트")]
+    public TMPro.TextMeshProUGUI statsText;
+    [Tooltip("메인 메뉴 버튼")]
+    public Button mainMenuButton;
+    [Tooltip("종료 버튼")]
+    public Button quitButton;
+
     // ── 내부 상태 ────────────────────────────────────────────────────────
     private bool _act2Triggered = false;
     private bool _beaconSpawned = false;
@@ -51,9 +64,12 @@ public class EndingManager : MonoBehaviour
     public bool IsAct2 => _act2Triggered;
     public bool IsFinalSortie => _finalSortieActive;
 
+    private float _gameStartTime;
+
     // ─────────────────────────────────────────────────────────────────────
     void Start()
     {
+        _gameStartTime = Time.time;
         // 자동 참조 탐색
         if (survivalTimer == null)
         {
@@ -72,6 +88,40 @@ public class EndingManager : MonoBehaviour
         // 안락도 변화 이벤트 구독
         if (cabinComfort != null)
             cabinComfort.OnComfortChanged += OnComfortChanged;
+
+        // PROLOGUE END 패널 자동 탐색
+        if (prologueEndPanel == null)
+        {
+            var go = GameObject.Find("PrologueEndPanel");
+            if (go != null) prologueEndPanel = go;
+        }
+        if (prologueEndPanel != null)
+        {
+            prologueEndPanel.SetActive(false);
+
+            // 버튼 자동 탐색
+            if (mainMenuButton == null)
+            {
+                var btn = prologueEndPanel.transform.Find("MainMenuBtn");
+                if (btn != null) mainMenuButton = btn.GetComponent<Button>();
+            }
+            if (quitButton == null)
+            {
+                var btn = prologueEndPanel.transform.Find("QuitBtn");
+                if (btn != null) quitButton = btn.GetComponent<Button>();
+            }
+            if (statsText == null)
+            {
+                var st = prologueEndPanel.transform.Find("PrologueStats");
+                if (st != null) statsText = st.GetComponent<TMPro.TextMeshProUGUI>();
+            }
+
+            // 버튼 이벤트 연결
+            if (mainMenuButton != null)
+                mainMenuButton.onClick.AddListener(GoToMainMenu);
+            if (quitButton != null)
+                quitButton.onClick.AddListener(QuitGame);
+        }
     }
 
     void OnDestroy()
@@ -407,11 +457,52 @@ public class EndingManager : MonoBehaviour
 
         yield return new WaitForSeconds(2f);
 
-        // 7. PROLOGUE END 표시
-        if (sub != null)
-            sub.ShowSubtitle("PROLOGUE END", 999f, true);
+        // 7. PROLOGUE END 패널 표시
+        ShowPrologueEndPanel();
 
         Debug.Log("[EndingManager] ★ 엔딩 완료.");
+    }
+
+    void ShowPrologueEndPanel()
+    {
+        // 생존 시간 계산
+        float elapsed = Time.time - _gameStartTime;
+        int mins = Mathf.FloorToInt(elapsed / 60f);
+        int secs = Mathf.FloorToInt(elapsed % 60f);
+
+        // 커서 해제
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        if (prologueEndPanel != null)
+        {
+            prologueEndPanel.SetActive(true);
+
+            if (statsText != null)
+                statsText.text = string.Format("총 생존 시간: {0:00}:{1:00}", mins, secs);
+        }
+        else
+        {
+            // 패널 없으면 자막으로 대체
+            var sub = SubtitleManager.Instance;
+            if (sub != null)
+                sub.ShowSubtitle("PROLOGUE END", 999f, true);
+        }
+    }
+
+    public void GoToMainMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(0);
+    }
+
+    public void QuitGame()
+    {
+        #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+        #else
+        Application.Quit();
+        #endif
     }
 
     IEnumerator FadeToWhite(float duration)

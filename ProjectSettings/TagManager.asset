@@ -12,6 +12,7 @@ TagManager:
   - ExitPoint
   - FurnitureItem
   - Wood
+  - Interactable
   layers:
   - Default
   - TransparentFX
