@@ -8274,7 +8274,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e9b4e2152efd184faea79918076662a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CabinComfort
-  maxFurnitureCount: 8
+  maxComfortValue: 8
 --- !u!4 &830682043
 Transform:
   m_ObjectHideFlags: 0

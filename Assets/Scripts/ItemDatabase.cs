@@ -41,4 +41,28 @@ public static class ItemDatabase
         { ItemType.Sofa,            7.5f },
         { ItemType.TableFurniture,  4.5f },
     };
+
+    /// <summary>
+    /// 가구별 안락도 기여 점수.
+    /// 무겁고 큰 가구일수록 안락도가 높음 → 수집 전략이 생김.
+    /// </summary>
+    public static readonly Dictionary<ItemType, float> ComfortValue = new Dictionary<ItemType, float>
+    {
+        // 기존 (레거시 — 혹시 스폰될 경우 대비)
+        { ItemType.OldChair,        1.0f },
+        { ItemType.WoodenTable,     1.0f },
+        { ItemType.Bookshelf,       1.5f },
+        { ItemType.Lantern,         0.3f },
+        { ItemType.HeavyCrate,      0.5f },
+        { ItemType.Rug,             0.5f },
+        { ItemType.WallClock,       0.3f },
+        { ItemType.SmallDrawer,     0.8f },
+
+        // Furniture Mega Pack
+        { ItemType.Bed,             2.0f },   // 침대: 최고
+        { ItemType.Sofa,            1.5f },   // 소파: 높음
+        { ItemType.TableFurniture,  1.0f },   // 테이블: 보통
+        { ItemType.Chair,           1.0f },   // 의자: 보통
+        { ItemType.Cushion,         0.5f },   // 쿠션: 낮음
+    };
 }
