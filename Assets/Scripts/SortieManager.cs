@@ -81,13 +81,9 @@ public class SortieManager : MonoBehaviour
                 SubtitleManager.Instance.ShowSubtitle("이번이 마지막이다... 중계기를 찾아야 해.", 5f, true);
         }
 
-        float mult = (skipEscalationOnFirstSortie && _sortieCount == 1)
-            ? initialColdMultiplier
-            : _nextColdMultiplier;
-
-        // 마지막 출격이면 EndingManager가 coldMultiplier를 직접 제어하므로 덮어쓰지 않음
+        // coldMultiplier는 항상 1.0x (2막 마지막 출격은 EndingManager가 제어)
         if (_endingManager == null || !_endingManager.IsFinalSortie)
-            ApplyColdMultiplier(mult);
+            ApplyColdMultiplier(1f);
 
         UpdateHUD();
 
@@ -95,8 +91,6 @@ public class SortieManager : MonoBehaviour
         {
             if (_sortieCount == 1)
                 SubtitleManager.Instance.ShowSubtitle("눈보라가 거세다... 필요한 가구만 빠르게 챙겨야 해.", 4f);
-            else if (_sortieCount == 3)
-                SubtitleManager.Instance.ShowSubtitle("점점 더 추워지는 기분이야... 너무 오래 밖을 맴돌면 위험해.", 4f);
         }
     }
 
@@ -110,11 +104,7 @@ public class SortieManager : MonoBehaviour
         var fc = Object.FindFirstObjectByType<FlashlightController>();
         if (fc != null) fc.RechargeBattery();
 
-        _nextColdMultiplier = Mathf.Min(
-            initialColdMultiplier + coldEscalationPerReturn * _returnCount,
-            maxColdMultiplier);
-
-        ApplyColdMultiplier(initialColdMultiplier);
+        ApplyColdMultiplier(1f);
         UpdateHUD();
     }
 
@@ -131,12 +121,8 @@ public class SortieManager : MonoBehaviour
         if (_sortieCount == 0)
             sortieHUDText.text = "별장 밖으로 나가 가구를 찾으세요";
         else if (!_isOutside)
-            sortieHUDText.text = _returnCount > 0
-                ? $"귀환 완료  |  다음 한파: {_nextColdMultiplier:F1}x" : "";
+            sortieHUDText.text = _returnCount > 0 ? "귀환 완료" : "";
         else
-        {
-            float cur = survivalTimer != null ? survivalTimer.coldMultiplier : 1f;
-            sortieHUDText.text = $"출격 #{_sortieCount}  ❄ 한파: {cur:F1}x";
-        }
+            sortieHUDText.text = $"출격 #{_sortieCount}";
     }
 }
