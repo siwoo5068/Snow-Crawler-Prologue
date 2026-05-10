@@ -50,6 +50,39 @@ public class AtmosphereManager : MonoBehaviour
             initialLightColor = environmentLight.color;
             initialLightIntensity = environmentLight.intensity;
         }
+
+        // ── 겨울 환경 초기화 ──────────────────────────────────────
+        InitWinterEnvironment();
+    }
+
+    /// <summary>씬 시작 시 겨울 분위기를 확실하게 세팅</summary>
+    void InitWinterEnvironment()
+    {
+        // 흐린 겨울 하늘 (Procedural Skybox)
+        var skyShader = Shader.Find("Skybox/Procedural");
+        if (skyShader != null)
+        {
+            var skyMat = new Material(skyShader);
+            skyMat.SetFloat("_SunSize", 0.02f);           // 작은 태양 (흐린 날)
+            skyMat.SetFloat("_SunSizeConvergence", 1f);
+            skyMat.SetFloat("_AtmosphereThickness", 2.5f); // 두꺼운 대기
+            skyMat.SetFloat("_Exposure", 0.8f);             // 어둡고 흐린 하늘
+            skyMat.SetColor("_SkyTint", new Color(0.55f, 0.60f, 0.70f));       // 회색빛 하늘
+            skyMat.SetColor("_GroundColor", new Color(0.85f, 0.88f, 0.92f));   // 눈빛 반사
+            RenderSettings.skybox = skyMat;
+        }
+
+        // 차가운 앰비언트 라이트
+        RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
+        RenderSettings.ambientLight = new Color(0.45f, 0.50f, 0.60f);
+
+        // Directional Light 겨울 설정
+        if (environmentLight != null)
+        {
+            environmentLight.color = coldLightColor;
+            environmentLight.intensity = coldIntensity;
+            environmentLight.shadowStrength = 0.4f;
+        }
     }
 
     void Update()

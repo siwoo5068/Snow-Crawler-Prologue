@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class FogManager : MonoBehaviour
 {
@@ -7,15 +7,15 @@ public class FogManager : MonoBehaviour
     private SortieManager _sortieManager;
 
     [Header("Safe Zone Fog")]
-    public float safeZoneFogDensity = 0.002f;
-    public Color safeZoneFogColor = new Color(0.8f, 0.85f, 0.9f);
+    public float safeZoneFogDensity = 0.008f;
+    public Color safeZoneFogColor = new Color(0.80f, 0.84f, 0.90f);
 
     [Header("Outside Fog Escalation")]
-    public float minOutsideDensity = 0.03f;
-    public Color minOutsideColor = new Color(0.7f, 0.75f, 0.8f);
+    public float minOutsideDensity = 0.04f;
+    public Color minOutsideColor = new Color(0.75f, 0.78f, 0.85f);
     public int maxFogSortieCount = 5;
-    public float maxOutsideDensity = 0.12f;
-    public Color maxOutsideColor = new Color(0.05f, 0.08f, 0.12f);
+    public float maxOutsideDensity = 0.15f;
+    public Color maxOutsideColor = new Color(0.20f, 0.22f, 0.28f);
 
     [Header("Blizzard Waves")]
     public float waveIntervalMin = 45f;
