@@ -32,7 +32,11 @@ public class FlashlightController : MonoBehaviour
         if (flashlight == null) flashlight = GetComponentInChildren<Light>();
         if (flashlight != null)
         {
-            // 코드에서 손전등 성능 확실히 설정
+            // 코드에서 손전등 성능 강제 설정 (씬 Inspector 값 덮어씀)
+            flashlightIntensity = 3.0f;
+            flashlightRange = 30f;
+            flashlightSpotAngle = 55f;
+
             flashlight.type = LightType.Spot;
             flashlight.intensity = flashlightIntensity;
             flashlight.range = flashlightRange;

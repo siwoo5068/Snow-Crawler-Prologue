@@ -48,6 +48,14 @@ public class FogManager : MonoBehaviour
         }
         _sortieManager = Object.FindFirstObjectByType<SortieManager>();
 
+        // 안개 값 강제 설정 (씬 Inspector 값 덮어씀)
+        safeZoneFogDensity = 0.008f;
+        safeZoneFogColor = new Color(0.80f, 0.84f, 0.90f);
+        minOutsideDensity = 0.04f;
+        minOutsideColor = new Color(0.75f, 0.78f, 0.85f);
+        maxOutsideDensity = 0.15f;
+        maxOutsideColor = new Color(0.20f, 0.22f, 0.28f);
+
         RenderSettings.fog = true;
         RenderSettings.fogMode = FogMode.Exponential;
         RenderSettings.fogColor = safeZoneFogColor;

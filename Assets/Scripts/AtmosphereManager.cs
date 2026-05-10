@@ -76,9 +76,11 @@ public class AtmosphereManager : MonoBehaviour
         RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
         RenderSettings.ambientLight = new Color(0.55f, 0.58f, 0.65f);
 
-        // Directional Light 겨울 설정
+        // Directional Light 겨울 설정 (씬 Inspector 값을 덮어씀)
         if (environmentLight != null)
         {
+            coldLightColor = new Color(0.65f, 0.72f, 0.85f);
+            coldIntensity = 0.7f;
             environmentLight.color = coldLightColor;
             environmentLight.intensity = coldIntensity;
             environmentLight.shadowStrength = 0.4f;
