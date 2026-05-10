@@ -190,18 +190,36 @@ public class SurvivalTimer : MonoBehaviour
         var pc = GetComponent<PlayerController>();
         if (pc != null) pc.enabled = false;
 
+        // 생존 시간 캐시 (시네마틱 후에도 사용)
+        float elapsed = Time.time - _sessionStartTime;
+        int mins = Mathf.FloorToInt(elapsed / 60f);
+        int secs = Mathf.FloorToInt(elapsed % 60f);
+        string survivedText = string.Format("Survived: {0:00}:{1:00}", mins, secs);
+
+        // GameDirector가 있으면 시네마틱 연출 후 패널 표시
+        if (GameDirector.Instance != null)
+        {
+            GameDirector.Instance.TriggerGameOverCinematic(() =>
+            {
+                ShowGameOverPanel(survivedText);
+            });
+        }
+        else
+        {
+            // GameDirector 없으면 즉시 패널 표시 (fallback)
+            ShowGameOverPanel(survivedText);
+        }
+    }
+
+    /// <summary>사망 패널을 띄우고 시간을 멈춤</summary>
+    void ShowGameOverPanel(string survivedText)
+    {
         // 마우스 커서 표시 (UI 버튼 클릭 가능)
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        float elapsed = Time.time - _sessionStartTime;
-        int mins = Mathf.FloorToInt(elapsed / 60f);
-        int secs = Mathf.FloorToInt(elapsed % 60f);
-
         if (gameOverPanel != null) gameOverPanel.SetActive(true);
-
-        if (gameOverTimeText != null)
-            gameOverTimeText.text = string.Format("Survived: {0:00}:{1:00}", mins, secs);
+        if (gameOverTimeText != null) gameOverTimeText.text = survivedText;
 
         Time.timeScale = 0f;
     }
