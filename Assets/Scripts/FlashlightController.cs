@@ -10,6 +10,14 @@ public class FlashlightController : MonoBehaviour
     public bool startsOn = true;
     public KeyCode toggleKey = KeyCode.F;
 
+    [Header("Light Power")]
+    [Tooltip("손전등 밝기 (높을수록 밝음)")]
+    public float flashlightIntensity = 3.0f;
+    [Tooltip("손전등 도달 거리")]
+    public float flashlightRange = 30f;
+    [Tooltip("빔 각도 (좁을수록 집중)")]
+    public float flashlightSpotAngle = 55f;
+
     [Header("Battery")]
     public float maxBattery = 100f;
     public float currentBattery;
@@ -24,7 +32,16 @@ public class FlashlightController : MonoBehaviour
         if (flashlight == null) flashlight = GetComponentInChildren<Light>();
         if (flashlight != null)
         {
-            _originalIntensity = flashlight.intensity;
+            // 코드에서 손전등 성능 확실히 설정
+            flashlight.type = LightType.Spot;
+            flashlight.intensity = flashlightIntensity;
+            flashlight.range = flashlightRange;
+            flashlight.spotAngle = flashlightSpotAngle;
+            flashlight.innerSpotAngle = flashlightSpotAngle * 0.6f;
+            flashlight.color = new Color(1f, 0.95f, 0.85f); // 따뜻한 백색
+            flashlight.shadows = LightShadows.Soft;
+
+            _originalIntensity = flashlightIntensity;
             flashlight.enabled = startsOn;
         }
         currentBattery = maxBattery;

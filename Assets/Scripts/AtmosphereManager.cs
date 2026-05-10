@@ -16,8 +16,8 @@ public class AtmosphereManager : MonoBehaviour
     public float safeZoneMeltSpeed = 3f;
 
     [Header("Cold Light (Outside)")]
-    public Color coldLightColor = new Color(0.55f, 0.65f, 0.85f);
-    public float coldIntensity = 0.35f;
+    public Color coldLightColor = new Color(0.65f, 0.72f, 0.85f);
+    public float coldIntensity = 0.7f;
 
     [Header("Warm Light (Safe Zone)")]
     public Color warmLightColor = new Color(1f, 0.82f, 0.45f);
@@ -72,9 +72,9 @@ public class AtmosphereManager : MonoBehaviour
             RenderSettings.skybox = skyMat;
         }
 
-        // 차가운 앰비언트 라이트
+        // 차가운 앨비언트 라이트 (밝은 눈밭 반사)
         RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
-        RenderSettings.ambientLight = new Color(0.45f, 0.50f, 0.60f);
+        RenderSettings.ambientLight = new Color(0.55f, 0.58f, 0.65f);
 
         // Directional Light 겨울 설정
         if (environmentLight != null)
