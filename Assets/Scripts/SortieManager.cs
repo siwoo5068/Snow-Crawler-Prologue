@@ -41,6 +41,11 @@ public class SortieManager : MonoBehaviour
 
         _endingManager = Object.FindFirstObjectByType<EndingManager>();
 
+        // 한파 에스컬레이션 값 강제 설정 (씬 Inspector 값 덮어씀)
+        initialColdMultiplier = 1f;
+        coldEscalationPerReturn = 0.15f;
+        maxColdMultiplier = 2.5f;
+
         _nextColdMultiplier = initialColdMultiplier;
         ApplyColdMultiplier(initialColdMultiplier);
         UpdateHUD();
